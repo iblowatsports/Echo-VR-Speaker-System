@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Speaker System/Library
+/Speaker System/obj
+/Speaker System/Temp

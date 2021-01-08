@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Speaker System",
+    "\\Speaker System\\Assets"
   ],
-  "SelectedNode": "\\.gitignore",
+  "SelectedNode": "\\README.md",
   "PreviewInSolutionExplorer": false
 }

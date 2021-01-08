@@ -16,14 +16,26 @@ using System.IO.Compression;
 using System.Text;
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Diagnostics;
 
 public class SpeakersStart : MonoBehaviour
 {
-    string VERSION_TAGNAME = "v0.2";
+    string VERSION_TAGNAME = "v0.3";
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern System.IntPtr GetActiveWindow();
 
+    [DllImport("WinAudioDLL", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void GetAudioEndpointInfo(StringBuilder str, int len);
+
+    public AudioEndpoints GetAudioInfo() {
+        StringBuilder str = new StringBuilder(16000);
+
+        GetAudioEndpointInfo(str, 16000);
+
+        return JsonUtility.FromJson<AudioEndpoints>(str.ToString());
+    }
     public static System.IntPtr GetWindowHandle()
     {
         return GetActiveWindow();
@@ -46,8 +58,14 @@ public class SpeakersStart : MonoBehaviour
         catch { }
     }
 
+    bool isAppListRefreshing = false;
     public AudioSource Source1;
     string inputName = "";
+    bool isFirstAppInit = true;
+    string appExeName = "";
+    string originalAppEndpoint = "";
+    bool wasAppEndpointChanged = false;
+    List<AppEndpoint> originalAppEndpoints = new List<AppEndpoint>();
     AudioSource masterSpeaker;
     List<AudioSource> speakers = new List<AudioSource>();
 
@@ -60,12 +78,14 @@ public class SpeakersStart : MonoBehaviour
     SpatialPlayerListener playerListener;
     AudioListener playerAudioListener;
     AudioLowPassFilter playerListernerLowPass; 
-    Dropdown.OptionData m_NewData;
-    List<Dropdown.OptionData> m_Messages = new List<Dropdown.OptionData>();
-    Dropdown m_Dropdown;
-    int m_Index;
+    Dropdown.OptionData AudioInputData, AppSelectionData;
+    AudioEndpoints audioEndpointsJson = null;
+    List<Dropdown.OptionData> AudioInputMessages = new List<Dropdown.OptionData>();
+    List<Dropdown.OptionData> AppSelectionMessages = new List<Dropdown.OptionData>();
+    Dropdown AudioInputDropdown, AppSelectionDropdown;
+    int AudioInputIndex, AppSelectionIndex;
     GameObject VACDownloadBtnGameObject, UpdateDownloadBtnGameObject;
-    Button MSSettingsBtn, VACDownloadBtn, UpdateDownloadBtn;
+    Button MSSettingsBtn, VACDownloadBtn, UpdateDownloadBtn, RefreshAppListBtn;
     string VACInputName = "(Virtual Audio Cable)"; 
     const int FREQUENCY = 48000;
     AudioClip mic;
@@ -75,11 +95,16 @@ public class SpeakersStart : MonoBehaviour
  
     // Use this for initialization
     void Start () {
-        Application.targetFrameRate = 60;
-        StartCoroutine(GetLatestVer());
-        inputName = PlayerPrefs.GetString("SourceName", "Line 1 (Virtual Audio Cable)");
-        m_Dropdown = GameObject.Find("AudioSourceDropdown").GetComponent<Dropdown>();
-        m_Dropdown.ClearOptions();
+        
+        Application.targetFrameRate = 25;
+        QualitySettings.vSyncCount = 0;
+        StartCoroutine(GetLatestVer());        
+
+        inputName = PlayerPrefs.GetString("InputName", "Line 1 (Virtual Audio Cable)");
+        appExeName = PlayerPrefs.GetString("AppSourceName", "");
+        AudioInputDropdown = GameObject.Find("AudioSourceDropdown").GetComponent<Dropdown>();
+        AudioInputDropdown.ClearOptions();
+        AppSelectionDropdown = GameObject.Find("AppSelectionDropdown").GetComponent<Dropdown>();
         MSSettingsBtn = GameObject.Find("OpenMSAppAudioSettingsBtn").GetComponent<Button>();
         VACDownloadBtnGameObject = GameObject.Find("OpenVACDownloadBtn");
         VACDownloadBtn = VACDownloadBtnGameObject.GetComponent<Button>();
@@ -88,8 +113,14 @@ public class SpeakersStart : MonoBehaviour
         UpdateDownloadBtn = UpdateDownloadBtnGameObject.GetComponent<Button>();
         UpdateDownloadBtnGameObject.SetActive(false);
 
+        RefreshAppListBtn = GameObject.Find("RefreshAppListBtn").GetComponent<Button>();
+
         MSSettingsBtn.onClick.AddListener(delegate {
             OpenWinAppAudioSettings();
+        });
+
+        RefreshAppListBtn.onClick.AddListener(delegate {
+            refreshAppList();
         });
         GameObject playerObject = GameObject.Find("Player Listener");
         playerListener = playerObject.GetComponent<SpatialPlayerListener>();
@@ -103,23 +134,28 @@ public class SpeakersStart : MonoBehaviour
         bool VACFound = false;
         foreach (var device in Microphone.devices)
         {
-            m_NewData = new Dropdown.OptionData();
-            m_NewData.text = device;
-            m_Messages.Add(m_NewData);
-            m_Dropdown.options.Add(m_NewData);
-            m_Index = m_Messages.Count - 1;
+            AudioInputData = new Dropdown.OptionData();
+            AudioInputData.text = device;
+            AudioInputMessages.Add(AudioInputData);
+            AudioInputDropdown.options.Add(AudioInputData);
+            AudioInputIndex = AudioInputMessages.Count - 1;
             if(device == inputName){
                 defaultFound = true;
-                m_Dropdown.value = m_Index;
+                AudioInputDropdown.value = AudioInputIndex;
             }
             if(device.Contains(VACInputName)){
                 VACFound = true;
             }
-            Debug.Log("Name: " + device);
+            UnityEngine.Debug.Log("Name: " + device);
         }
-        m_Dropdown.onValueChanged.AddListener(delegate {
-            SourceDropdownValueChanged(m_Dropdown);
+        
+        AudioInputDropdown.onValueChanged.AddListener(delegate {
+            InputDropdownValueChanged(AudioInputDropdown);
         });
+        AppSelectionDropdown.onValueChanged.AddListener(delegate {
+            AppSelectionDropdownValueChanged(AppSelectionDropdown);
+        });
+        refreshAppList();
         if(!defaultFound && !VACFound){
             Error("Couldn't find audio device " + inputName + ". Make sure to install Virtual Audio Cable and set the output device of your music source to " + inputName + " in the Windows settings under 'App Volume and Device Settings'.", "Error");
             VACDownloadBtnGameObject.SetActive(true);
@@ -132,6 +168,7 @@ public class SpeakersStart : MonoBehaviour
     }
 
     void sourceInit(){
+        
         mic = Microphone.Start(inputName, true, 300, FREQUENCY);
         reverseLoopOrder = false;
         loops = 0;
@@ -143,6 +180,42 @@ public class SpeakersStart : MonoBehaviour
             aSource.loop = true;
         }
         StartCoroutine(SyncSourcesInit());
+    }
+
+    void refreshAppList(){
+        isAppListRefreshing = true;
+        bool pastSelectedAppFound = false;
+        audioEndpointsJson = GetAudioInfo();
+        AppSelectionDropdown.ClearOptions();
+        AppSelectionMessages = new List<Dropdown.OptionData>();
+        AppSelectionIndex = 0;
+        var appDropdownLabel = new Dropdown.OptionData("Select App to Be Played");
+        AppSelectionDropdown.options.Insert(0, appDropdownLabel);
+        AppSelectionMessages.Add(appDropdownLabel);
+        AppSelectionDropdown.captionText.text = "Select App to Be Played";
+        foreach (var endpoint in audioEndpointsJson.endpoints)
+        {
+            foreach(var session in endpoint.sessions){
+                if(!AppSelectionMessages.Any(m => m.text == session.exeName) && session.exeName != "Echo Speaker System" && session.exeName != "NVIDIA RTX Voice"){
+                    AppSelectionData = new Dropdown.OptionData();
+                    AppSelectionData.text = session.exeName;
+                    AppSelectionMessages.Add(AppSelectionData);
+                    AppSelectionDropdown.options.Add(AppSelectionData);
+                    AppSelectionIndex = AppSelectionMessages.Count - 1;
+                    if(session.exeName == appExeName){
+                        pastSelectedAppFound = true;
+                        AppSelectionDropdown.value = AppSelectionIndex;
+                    }
+                }
+            }
+        }
+        if(!pastSelectedAppFound){
+            AppSelectionDropdown.value = 0;
+        }
+        AppSelectionDropdown.enabled = false;
+        AppSelectionDropdown.enabled = true;
+        AppSelectionDropdown.RefreshShownValue();
+        isAppListRefreshing = false;
     }
    
     // Update is called once per frame
@@ -158,6 +231,17 @@ public class SpeakersStart : MonoBehaviour
  
                 // Get the data from microphone.
                 mic.GetData(sample, lastPos);
+                float highest = 0.0f;
+                for(int i = 0; i < sample.Length; i++){
+                    if(sample[i] > highest){
+                        highest = sample[i];
+                    }
+                    sample[i] = sample[i] * 1.95f;
+                    if(sample[i] > 1.0f){
+                        UnityEngine.Debug.Log(sample[i]);
+                        sample[i] = 1.0f;
+                    }
+                }
                 
                 if(!reverseLoopOrder){
                     foreach(AudioSource aSource in speakers){
@@ -169,7 +253,6 @@ public class SpeakersStart : MonoBehaviour
                         //     aSource.Pause();
                         // }
                         if(!aSource.isPlaying){aSource.Play();}
-                        //aSource.timeSamples = masterSpeaker.timeSamples;
                         reverseLoopOrder = true;
                     }
                     masterSpeaker.clip.SetData(sample, lastPos);
@@ -199,7 +282,7 @@ public class SpeakersStart : MonoBehaviour
                 if(playerXAbs > 40f){
                     float vol = Map(playerXAbs, 40.0001f, 90f, 0.01f, 0.79f);
                     AudioListener.volume = 0.49f + (Mathf.Log10(vol) / -4.0f);//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
-                    Debug.Log(AudioListener.volume);
+                    //Debug.Log(AudioListener.volume);
                     vol = Map(playerXAbs, 40.0001f, 76f, 0.0001f, 1.0f);
                     playerListernerLowPass.cutoffFrequency = 4000 +((Mathf.Log10(vol) / -4.0f) * 16000f);
                     
@@ -242,14 +325,78 @@ public class SpeakersStart : MonoBehaviour
         // }
     }
 
-    void SourceDropdownValueChanged(Dropdown change)
+    void InputDropdownValueChanged(Dropdown change)
     {
-        Microphone.End(inputName);
-        var newInput = m_Dropdown.options[m_Dropdown.value].text;
-        PlayerPrefs.SetString("SourceName", newInput);
-        PlayerPrefs.Save();
-        inputName = newInput;
-        sourceInit();
+        if(!isAppListRefreshing){
+            var newInput = AudioInputDropdown.options[AudioInputDropdown.value].text;
+            var audioCableOutput = audioEndpointsJson.endpoints.FirstOrDefault(e => e.name == newInput);
+            
+            if(audioCableOutput == null){
+                AppSelectionDropdown.interactable = false;
+                var session = audioEndpointsJson.endpoints
+                .SelectMany(e => e.sessions)
+                .Where(s => s.exeName == appExeName)
+                .FirstOrDefault();
+                if(session != null){
+                    StartCoroutine(resetAppToOriginalEndpoint(session.processId));
+                }
+            }else{
+                AppSelectionDropdown.interactable = true;
+                if(AppSelectionDropdown.value != 0){
+                    var session = audioEndpointsJson.endpoints
+                    .SelectMany(e => e.sessions)
+                    .Where(s => s.exeName == appExeName)
+                    .FirstOrDefault();
+                    if(session != null){
+                        StartCoroutine(setAppToVAC(session.processId, newInput, false));
+                    }
+                }
+            }
+            Microphone.End(inputName);
+            PlayerPrefs.SetString("InputName", newInput);
+            PlayerPrefs.Save();
+            inputName = newInput;
+            sourceInit();
+        }
+    }
+
+    void AppSelectionDropdownValueChanged(Dropdown change)
+    {
+        var newAppSource = AppSelectionDropdown.options[AppSelectionDropdown.value].text;
+        if (isFirstAppInit || newAppSource != appExeName)
+        {
+            isFirstAppInit = false;
+            var oldSession = audioEndpointsJson.endpoints
+                .SelectMany(e => e.sessions)
+                .Where(s => s.exeName == appExeName)
+                .FirstOrDefault();
+            if (oldSession != null)
+            {
+                AppEndpoint originalEndpoint = originalAppEndpoints.FirstOrDefault(appEP => appEP.processId == oldSession.processId);
+                if (originalEndpoint != null)
+                {
+                    StartCoroutine(resetAppToOriginalEndpoint(oldSession.processId));
+                }
+            }
+            if(AppSelectionDropdown.value == 0){
+                appExeName = "";
+                PlayerPrefs.SetString("AppSourceName", appExeName);
+                PlayerPrefs.Save();
+            }else{
+                PlayerPrefs.SetString("AppSourceName", newAppSource);
+                PlayerPrefs.Save();
+                appExeName = newAppSource;
+                    var newSession = audioEndpointsJson.endpoints
+                    .SelectMany(e => e.sessions)
+                    .Where(s => s.exeName == appExeName)
+                    .FirstOrDefault();
+                    if(newSession != null){
+                        StartCoroutine(setAppToVAC(newSession.processId, inputName));
+                        Microphone.End(inputName);
+                        sourceInit();
+                    }
+            }
+        }
     }
 
     void OpenWinAppAudioSettings()
@@ -288,9 +435,91 @@ public class SpeakersStart : MonoBehaviour
              loops = 0;
         //  }    
      } 
+
+private IEnumerator setAppToVAC(int procID, string input, bool retainOriginalEndpoint = true)
+     {
+        var audioCableOutput = audioEndpointsJson.endpoints.FirstOrDefault(e => e.name == input);
+        if(audioCableOutput != null){
+            Process AudioSwitch = new Process {
+                StartInfo = new ProcessStartInfo {
+                    FileName = ( Application.streamingAssetsPath+"\\AudioSwitch.exe"), 
+                    Arguments = procID + " \""+ audioCableOutput.id + "\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardInput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                }
+
+            };
+            AudioSwitch.Start();
+            AudioSwitch.WaitForExit(900);
+            string line = AudioSwitch.StandardOutput.ReadLine();
+            if(AudioSwitch.ExitCode == 0){
+                wasAppEndpointChanged = true;
+                if(retainOriginalEndpoint){
+                    if(string.IsNullOrWhiteSpace(line)){
+                        originalAppEndpoints.Add(new AppEndpoint{processId = procID, originalEndpointID = ""});
+                    }else{
+                        originalAppEndpoints.Add(new AppEndpoint{processId = procID, originalEndpointID = line});
+                    }
+                }
+            }
+        }
+        StartCoroutine(SyncSources());
+        yield return null;
+     }
+     private IEnumerator resetAppToOriginalEndpoint(int procID)
+     {
+            AppEndpoint originalEndpoint = originalAppEndpoints.FirstOrDefault(appEP => appEP.processId == procID);
+            if(originalEndpoint != null){
+                Process AudioSwitch = new Process {
+                    StartInfo = new ProcessStartInfo {
+                        FileName = ( Application.streamingAssetsPath+"\\AudioSwitch.exe"), 
+                        Arguments = procID + " \""+ originalEndpoint.originalEndpointID + "\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardInput = true,
+                        RedirectStandardError = true,
+                        CreateNoWindow = true
+                    }
+
+                };
+                AudioSwitch.Start();
+                AudioSwitch.WaitForExit(900);
+                wasAppEndpointChanged = false;
+                originalAppEndpoint = "";
+                originalAppEndpoints.Remove(originalEndpoint);
+            }
+        yield return null;
+     }
  
     void OnDestroy(){
         Microphone.End(inputName);
+        if(wasAppEndpointChanged){
+                var Originalsession = audioEndpointsJson.endpoints
+            .SelectMany(e => e.sessions)
+            .Where(s => s.exeName == appExeName)
+            .FirstOrDefault();
+        if(Originalsession != null){
+            Process AudioSwitch = new Process {
+                StartInfo = new ProcessStartInfo {
+                    FileName = ( Application.streamingAssetsPath+"\\AudioSwitch.exe"), 
+                    Arguments = Originalsession.processId + " \""+ originalAppEndpoint + "\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardInput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                }
+
+            };
+            AudioSwitch.Start();
+            AudioSwitch.WaitForExit(900);
+            wasAppEndpointChanged = false;
+            originalAppEndpoint = "";
+            }
+    }
     }
 
     IEnumerator GetLatestVer()
@@ -481,6 +710,31 @@ public class Rhand
     public float[] left;
     public float[] up;
     public float[] forward;
+}
+
+[System.Serializable]
+public class AudioEndpoints
+{
+    public Endpoint[] endpoints;
+}
+[System.Serializable]
+public class Endpoint
+{
+    public Session[] sessions;
+    public string name;
+    public string id;
+}
+[System.Serializable]
+public class Session
+{
+    public string exeName;
+    public int processId;
+}
+
+public class AppEndpoint
+{
+    public string originalEndpointID;
+    public int processId;
 }
 
 public class PlayerStats : Stats

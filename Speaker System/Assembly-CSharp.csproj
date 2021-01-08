@@ -274,7 +274,7 @@
  <HintPath>F:/Program Files/Unity/Hub/Editor/2019.3.9f1/Editor/Data/Managed/UnityEditor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Burst.Unsafe">
- <HintPath>F:/Dev/Echo Arena Projects/EchoVRSpeakerSystem/Speaker System/Library/PackageCache/com.unity.burst@1.1.1/Unity.Burst.Unsafe.dll</HintPath>
+ <HintPath>F:/Dev/Echo Arena Projects/Echo-VR-Speaker-System/Speaker System/Library/PackageCache/com.unity.burst@1.1.1/Unity.Burst.Unsafe.dll</HintPath>
  </Reference>
  <Reference Include="mscorlib">
  <HintPath>F:/Program Files/Unity/Hub/Editor/2019.3.9f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -632,6 +632,12 @@
  </Reference>
  <Reference Include="System.IO.Compression">
  <HintPath>F:/Program Files/Unity/Hub/Editor/2019.3.9f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/System.IO.Compression.dll</HintPath>
+ </Reference>
+ <Reference Include="WindowsBase">
+ <HintPath>F:/Dev/Echo Arena Projects/Echo-VR-Speaker-System/Speaker System/Assets/Plugins/x86/WindowsBase.dll</HintPath>
+ </Reference>
+ <Reference Include="System.Windows">
+ <HintPath>F:/Program Files/Unity/Hub/Editor/2019.3.9f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/System.Windows.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>

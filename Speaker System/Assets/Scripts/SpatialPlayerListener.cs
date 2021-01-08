@@ -15,6 +15,7 @@ public class SpatialPlayerListener : MonoBehaviour
     public Vector3 headUp;
     public Transform head;
     string tempPlayerName = "";
+    float lastAPITime = 0.0f;
     bool isClientSpectator = false;
     // Start is called before the first frame update
     void Start()
@@ -103,6 +104,11 @@ public class SpatialPlayerListener : MonoBehaviour
                             }
                         }
                     }
+                    var currentFrameTime = Time.realtimeSinceStartup;
+                    if((currentFrameTime - lastAPITime) != 0){
+                        Debug.Log(String.Format("Frame receive rate: {0} hz", 1/(currentFrameTime - lastAPITime)));
+                    }
+                    lastAPITime = currentFrameTime;
                     if(!found && tempPlayerName.Length > 0){
                         tempPlayerName = "";
                     }

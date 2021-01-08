@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\Speaker System",
-    "\\Speaker System\\Assets"
+    "\\Speaker System\\Assets",
+    "\\Speaker System\\Assets\\Scripts"
   ],
-  "SelectedNode": "\\README.md",
+  "SelectedNode": "\\Speaker System\\Assets\\Scripts\\SpeakersStart.cs",
   "PreviewInSolutionExplorer": false
 }

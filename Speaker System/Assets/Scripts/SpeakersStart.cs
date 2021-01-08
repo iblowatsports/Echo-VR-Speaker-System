@@ -21,7 +21,7 @@ using System.Diagnostics;
 
 public class SpeakersStart : MonoBehaviour
 {
-    string VERSION_TAGNAME = "v0.3";
+    string VERSION_TAGNAME = "v0.3.1";
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern System.IntPtr GetActiveWindow();

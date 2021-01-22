@@ -9,7 +9,7 @@ This is a system to take any audio stream (usually music) and make it sound like
   
  ## Setup
  
- * Go to **releases** and download the latest Zip, unzip the files to wherever you want the folder
+ * Go to **[releases](https://github.com/iblowatsports/Echo-VR-Speaker-System/releases/latest)** and download the latest Zip, unzip the files to wherever you want the folder
  * In the in-game settings for Echo VR, make sure that "Enable API Access" is set to "Enabled"
  * Run Echo Speaker System.exe from the folder you unzipped it to, when it launches: 
    * Unless you have a specific use case, set/leave the Audio Input selection on "Line 1(Virtual Audio Cable). This is used as the audio input device for the speakers

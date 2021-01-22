@@ -2,6 +2,8 @@
 
 This is a system to take any audio stream (usually music) and make it sound like it is being played from "speakers" in a stadium outside of the Arena when you are playing. This is positional audio that adds realistic echo/reverberations as well as taking into account the geometry of the Arena itself so that it feels as though you are hearing your music from a stadium surrounding you.
 
+![Speaker System App](https://github.com/iblowatsports/Echo-VR-Speaker-System/blob/main/EchoSpeakerSystem.png?raw=true)
+
 
 ## This project requires Virtual Audio Cable
   * [Install lite (free) version here](https://software.muzychenko.net/freeware/vac464lite.zip)

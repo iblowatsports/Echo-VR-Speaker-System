@@ -10,6 +10,8 @@ This is a system to take any audio stream (usually music) and make it sound like
  ## Setup
  
  * Go to **releases** and download the latest Zip, unzip the files to wherever you want the folder
- * In the Windows settings page ["App volume and device preferences"](ms-settings:apps-volume), set the **output** device to "Line 1 (Virtual Audio Cable)" for the music app/browser window with the sound that you want to be played via the Arena speakers
  * In the in-game settings for Echo VR, make sure that "Enable API Access" is set to "Enabled"
- * Run Echo Speaker System.exe from the folder you unzipped it to whenever you want the audio to be played via the "speakers" 
+ * Run Echo Speaker System.exe from the folder you unzipped it to, when it launches: 
+   * Unless you have a specific use case, set/leave the Audio Input selection on "Line 1(Virtual Audio Cable). This is used as the audio input device for the speakers
+   * Select the application you would like played via the "speakers" (you may have to hit the refresh app list button if it does not show up). This will switch the selected app to be played via another input device. 
+* Any sound played from the selected application will now go through the virtual speakers surrounding the arena. Once you close the Echo Speaker System exe, the application you had selected will be switched back to the audio device it originally was using. Any time the Echo Speaker System exe is run in the future, it will attempt to automatically find and use the Application you had previously used with the Speaker System

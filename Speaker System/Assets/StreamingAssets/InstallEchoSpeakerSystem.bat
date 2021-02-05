@@ -7,6 +7,7 @@ echo.
 @echo off
 echo Downloading and installing Echo Speaker System...
 @echo off
+mkdir "C:\Temp" > nul 2> nul
 curl.exe -L -o C:\Temp\%latestVer%.zip "%latestURL%" > nul 2> nul
 mkdir "C:\Program Files (x86)\Echo Speaker System" > nul 2> nul
 setlocal

@@ -6,12 +6,12 @@ This is a system to take any audio stream (usually music) and make it sound like
 
 
 ## This project requires Virtual Audio Cable
-  * [Install lite (free) version here](https://software.muzychenko.net/freeware/vac464lite.zip)
+  * The Echo Speaker System installer will automatically download and open the installer of Virtual Audio Cable if you do not have it installed
   * After installing VAC, make sure to restart your PC and to reset your default audio input and output devices in the Windows settings (Windows will automatically set Virtual Audio Cable as the default input and output device at install time, which you don't want)
   
  ## Setup
  
- * Go to **[releases](https://github.com/iblowatsports/Echo-VR-Speaker-System/releases/latest)** and download the latest Zip, unzip the files to wherever you want the folder
+ * Go to **[releases](https://github.com/iblowatsports/Echo-VR-Speaker-System/releases/latest)** and download the InstallEchoSpeakerSystem.bat file, run this file as administrator to install Echo Speaker System and follow any UI prompts for Virtual Audio Cable installation if required (restart if needed as well)
  * In the in-game settings for Echo VR, make sure that "Enable API Access" is set to "Enabled"
  * Run Echo Speaker System.exe from the folder you unzipped it to, when it launches: 
    * Unless you have a specific use case, set/leave the Audio Input selection on "Line 1(Virtual Audio Cable). This is used as the audio input device for the speakers

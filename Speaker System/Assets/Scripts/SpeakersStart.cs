@@ -660,10 +660,10 @@ public class SpeakersStart : MonoBehaviour
         using (UnityWebRequest webRequest = UnityWebRequest.Get("https://api.github.com/repos/iblowatsports/Echo-VR-Speaker-System/releases/latest"))
         {
             // Request and wait for the desired page. 73
+            
+                yield return webRequest.SendWebRequest();
             try
             {
-                yield return webRequest.SendWebRequest();
-
                 if (webRequest.isNetworkError)
                 {
                 }

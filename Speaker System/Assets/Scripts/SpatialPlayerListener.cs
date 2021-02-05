@@ -18,6 +18,7 @@ public class SpatialPlayerListener : MonoBehaviour
     public Vector3 headUp;
     public Transform head;
     public bool isIgniteBotEmbedded = false;
+    public bool isReverbMixChangeOn = true;
     public NetMQPoller poller;
     public SubscriberSocket subSocket;
     public string addr = "tcp://localhost:12345";
@@ -34,11 +35,7 @@ public class SpatialPlayerListener : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        isIgniteBotEmbedded = false;
-        Head defaultHeadPos = JsonUtility.FromJson<Head>(defaultPos);
-        _playerHeadPosition = defaultHeadPos.position;
-        _playerHeadForward = defaultHeadPos.forward;
-        _playerHeadUp = defaultHeadPos.up;
+        SetDefaultListenerPosition();
         string[] args = System.Environment.GetCommandLineArgs();
         for (int i = 0; i < args.Length; i++)
         {
@@ -62,6 +59,7 @@ public class SpatialPlayerListener : MonoBehaviour
             subSocket.Connect(addr);
             subSocket.Subscribe("RawFrame");
             subSocket.Subscribe("CloseApp");
+            subSocket.Subscribe("MatchEvent");
 
             poller.Add(subSocket);
             poller.RunAsync();
@@ -89,8 +87,16 @@ public class SpatialPlayerListener : MonoBehaviour
             if (str == "CloseApp")
             {
                 quitCalled = true;
+            }else if(str == "MatchEvent"){
+                string messageReceived = e.Socket.ReceiveFrameString();
+                try{
+                    MatchEvent eventMSG = JsonUtility.FromJson<MatchEvent>(messageReceived);
+                    if(eventMSG.EventTypeName == "LeaveMatch"){
+                        SetDefaultListenerPosition();
+                    }
+                }catch{}
             }
-            else
+            else if(str == "RawFrame")
             {
                 string messageReceived = e.Socket.ReceiveFrameString();
                 Console.WriteLine(messageReceived + "\n");
@@ -181,14 +187,20 @@ public class SpatialPlayerListener : MonoBehaviour
             {
                 StartCoroutine(GetRequest());
             }
-            else
-            {
-                playerObject.transform.position = new Vector3(_playerHeadPosition[2], _playerHeadPosition[1], _playerHeadPosition[0]);
-                headUp = new Vector3(_playerHeadUp[2], _playerHeadUp[1], _playerHeadUp[0]);
-                headForward = new Vector3(_playerHeadForward[2], _playerHeadForward[1], _playerHeadForward[0]);
-                playerObject.transform.LookAt(headForward + transform.position, headUp);
-            }
+
+            playerObject.transform.position = new Vector3(_playerHeadPosition[2], _playerHeadPosition[1], _playerHeadPosition[0]);
+            headUp = new Vector3(_playerHeadUp[2], _playerHeadUp[1], _playerHeadUp[0]);
+            headForward = new Vector3(_playerHeadForward[2], _playerHeadForward[1], _playerHeadForward[0]);
+            playerObject.transform.LookAt(headForward + transform.position, headUp);
+            
         }
+    }
+
+    void SetDefaultListenerPosition(){
+        Head defaultHeadPos = JsonUtility.FromJson<Head>(defaultPos);
+        _playerHeadPosition = defaultHeadPos.position;
+        _playerHeadForward = defaultHeadPos.forward;
+        _playerHeadUp = defaultHeadPos.up;
     }
     IEnumerator GetRequest()
     {
@@ -202,14 +214,7 @@ public class SpatialPlayerListener : MonoBehaviour
                 //Debug.Log(": Error: " + webRequest.error);
                 try
                 {
-                    Head defaultHeadPos = JsonUtility.FromJson<Head>(defaultPos);
-                    float[] playerHeadPosition = defaultHeadPos.position;
-                    float[] playerHeadForward = defaultHeadPos.forward;
-                    float[] playerHeadUp = defaultHeadPos.up;
-                    playerObject.transform.position = new Vector3(playerHeadPosition[2], playerHeadPosition[1], playerHeadPosition[0]);
-                    headUp = new Vector3(playerHeadUp[2], playerHeadUp[1], playerHeadUp[0]);
-                    headForward = new Vector3(playerHeadForward[2], playerHeadForward[1], playerHeadForward[0]);
-                    playerObject.transform.LookAt(headForward + transform.position, headUp);
+                    SetDefaultListenerPosition();
                 }
                 catch (Exception e)
                 {
@@ -241,13 +246,9 @@ public class SpatialPlayerListener : MonoBehaviour
                                     {
                                         found = true;
                                         isClientSpectator = false;
-                                        float[] playerHeadPosition = p.head.position;
-                                        float[] playerHeadForward = p.head.forward;
-                                        float[] playerHeadUp = p.head.up;
-                                        playerObject.transform.position = new Vector3(playerHeadPosition[2], playerHeadPosition[1], playerHeadPosition[0]);
-                                        headUp = new Vector3(playerHeadUp[2], playerHeadUp[1], playerHeadUp[0]);
-                                        headForward = new Vector3(playerHeadForward[2], playerHeadForward[1], playerHeadForward[0]);
-                                        playerObject.transform.LookAt(headForward + transform.position, headUp);
+                                        _playerHeadPosition = p.head.position;
+                                        _playerHeadForward = p.head.forward;
+                                        _playerHeadUp = p.head.up;
                                     }
 
                                 }
@@ -259,26 +260,18 @@ public class SpatialPlayerListener : MonoBehaviour
                                         {
                                             found = true;
                                             tempPlayerName = p.name;
-                                            float[] playerHeadPosition = p.head.position;
-                                            float[] playerHeadForward = p.head.forward;
-                                            float[] playerHeadUp = p.head.up;
-                                            playerObject.transform.position = new Vector3(playerHeadPosition[2], playerHeadPosition[1], playerHeadPosition[0]);
-                                            headUp = new Vector3(playerHeadUp[2], playerHeadUp[1], playerHeadUp[0]);
-                                            headForward = new Vector3(playerHeadForward[2], playerHeadForward[1], playerHeadForward[0]);
-                                            playerObject.transform.LookAt(headForward + transform.position, headUp);
+                                            _playerHeadPosition = p.head.position;
+                                            _playerHeadForward = p.head.forward;
+                                            _playerHeadUp = p.head.up;
                                         }
                                     }
                                     else if (p.name == tempPlayerName && t.team != "SPECTATORS")
                                     {
                                         found = true;
                                         tempPlayerName = p.name;
-                                        float[] playerHeadPosition = p.head.position;
-                                        float[] playerHeadForward = p.head.forward;
-                                        float[] playerHeadUp = p.head.up;
-                                        playerObject.transform.position = new Vector3(playerHeadPosition[2], playerHeadPosition[1], playerHeadPosition[0]);
-                                        headUp = new Vector3(playerHeadUp[2], playerHeadUp[1], playerHeadUp[0]);
-                                        headForward = new Vector3(playerHeadForward[2], playerHeadForward[1], playerHeadForward[0]);
-                                        playerObject.transform.LookAt(headForward + transform.position, headUp);
+                                        _playerHeadPosition = p.head.position;
+                                        _playerHeadForward = p.head.forward;
+                                        _playerHeadUp = p.head.up;
                                     }
                                 }
                             }
@@ -300,14 +293,7 @@ public class SpatialPlayerListener : MonoBehaviour
                     //Debug.Log(e);
                     try
                     {
-                        Head defaultHeadPos = JsonUtility.FromJson<Head>(defaultPos);
-                        float[] playerHeadPosition = defaultHeadPos.position;
-                        float[] playerHeadForward = defaultHeadPos.forward;
-                        float[] playerHeadUp = defaultHeadPos.up;
-                        playerObject.transform.position = new Vector3(playerHeadPosition[2], playerHeadPosition[1], playerHeadPosition[0]);
-                        headUp = new Vector3(playerHeadUp[2], playerHeadUp[1], playerHeadUp[0]);
-                        headForward = new Vector3(playerHeadForward[2], playerHeadForward[1], playerHeadForward[0]);
-                        playerObject.transform.LookAt(headForward + transform.position, headUp);
+                        SetDefaultListenerPosition();
                     }
                     catch
                     {

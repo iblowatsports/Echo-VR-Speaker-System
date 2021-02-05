@@ -100,7 +100,7 @@ LightmapSettings:
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 112000000, guid: a530d7df96fd6064695938479becb73a,
     type: 2}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -6829,7 +6829,8 @@ MonoBehaviour:
   headForward: {x: 0, y: 0, z: 0}
   headUp: {x: 0, y: 0, z: 0}
   head: {fileID: 1015268150}
-  isIgniteBotEmbedded: 1
+  isIgniteBotEmbedded: 0
+  isReverbMixChangeOn: 1
   addr: tcp://localhost:12345
   quitCalled: 0
   hasCleanedUp: 0
@@ -11666,6 +11667,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 034fbd32a887ca647a425aac7b9a5e6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  VERSION_TAGNAME: v0.3.3
   Source1: {fileID: 0}
   hasCleanedUp: 0
 --- !u!1 &1923616719

@@ -18,10 +18,11 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Diagnostics;
+using SteamAudio;
 
 public class SpeakersStart : MonoBehaviour
 {
-    string VERSION_TAGNAME = "v0.3.2";
+    public string VERSION_TAGNAME = "v0.3.3";
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern System.IntPtr GetActiveWindow();
@@ -72,7 +73,7 @@ public class SpeakersStart : MonoBehaviour
     List<AudioSource> speakers = new List<AudioSource>();
 
     AudioEchoFilter masterSpeakerEcho;
-    List<AudioEchoFilter> speakerFilters = new List<AudioEchoFilter>();
+    List<SteamAudioSource> steamAudioSpeakers = new List<SteamAudioSource>();
 
     string latestReleaseURL = "";
     string latestReleaseVer = "";
@@ -139,6 +140,10 @@ public class SpeakersStart : MonoBehaviour
         for (int i = 2; i <= speakerCount; i++)
         {
             speakers.Add(GameObject.Find("Speaker " + i).GetComponent<AudioSource>());
+        }
+        for (int i = 1; i <= speakerCount; i++)
+        {
+            steamAudioSpeakers.Add(GameObject.Find("Speaker " + i).GetComponent<SteamAudioSource>());
         }
         bool defaultFound = false;
         bool VACFound = false;
@@ -258,6 +263,33 @@ public class SpeakersStart : MonoBehaviour
                 if (pos - lastPos > 0)
                 {
                     float playerXAbs = Math.Abs(playerListener.head.position.x);
+                    if (playerXAbs > 40f)
+                    {
+                        float vol = Map(playerXAbs, 40.0001f, 90f, 0.01f, 0.79f);
+                        AudioListener.volume = 0.49f + (Mathf.Log10(vol) / -4.0f);//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
+                                                                                  //Debug.Log(AudioListener.volume);
+                        foreach (SteamAudioSource steamSource in steamAudioSpeakers)
+                        {
+                            steamSource.indirectMixLevel = playerListener.isReverbMixChangeOn? AudioListener.volume * 1.0f : 1.0f;
+                        }
+                        vol = Map(playerXAbs, 40.0001f, 76f, 0.0001f, 1.0f);
+                        playerListernerLowPass.cutoffFrequency = 2000 + ((Mathf.Log10(vol) / -4.0f) * 16000f);
+
+                    }
+                    else
+                    {
+                        //float vol2 = Map(40.001f, 40.0001f, 90f, 0.004f, 1.0f);
+                        //AudioListener.volume = Mathf.Log10(vol) / -4.0f;//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
+                        //Debug.Log(Mathf.Log10(vol2) / -4.0f);
+                        if(AudioListener.volume != 1.0f){
+                            foreach (SteamAudioSource steamSource in steamAudioSpeakers)
+                            {
+                                steamSource.indirectMixLevel = 1.0f;
+                            }
+                        }
+                        AudioListener.volume = 1.0f;
+                        playerListernerLowPass.cutoffFrequency = 22000f;
+                    }
                     // Allocate the space for the sample.
                     float[] sample = new float[(pos - lastPos) * 1];
 
@@ -284,7 +316,7 @@ public class SpeakersStart : MonoBehaviour
                         {
                             aSource.clip.SetData(sample, lastPos);
                             AudioEchoFilter echo = aSource.GetComponent<AudioEchoFilter>();
-                            float dist = Vector3.Distance(aSource.transform.position, playerListener.transform.position) * 1.142f;
+                            float dist = UnityEngine.Vector3.Distance(aSource.transform.position, playerListener.transform.position) * 1.142f;
                             echo.delay = dist;
                             // if(loops > 300){
                             //     aSource.Pause();
@@ -294,7 +326,7 @@ public class SpeakersStart : MonoBehaviour
                         }
                         masterSpeaker.clip.SetData(sample, lastPos);
                         AudioEchoFilter MasterEcho = masterSpeaker.GetComponent<AudioEchoFilter>();
-                        float Mastdist = Vector3.Distance(masterSpeaker.transform.position, playerListener.transform.position) * 1.142f; ;
+                        float Mastdist = UnityEngine.Vector3.Distance(masterSpeaker.transform.position, playerListener.transform.position) * 1.142f; ;
                         MasterEcho.delay = Mastdist;
                         if (!masterSpeaker.isPlaying) { masterSpeaker.Play(); }
                     }
@@ -304,7 +336,7 @@ public class SpeakersStart : MonoBehaviour
                         {
                             aSource.clip.SetData(sample, lastPos);
                             AudioEchoFilter echo = aSource.GetComponent<AudioEchoFilter>();
-                            float dist = Vector3.Distance(aSource.transform.position, playerListener.transform.position) * 1.142f;
+                            float dist = UnityEngine.Vector3.Distance(aSource.transform.position, playerListener.transform.position) * 1.142f;
                             echo.delay = dist;
                             // if(loops > 300){
                             //     aSource.Pause();
@@ -315,26 +347,9 @@ public class SpeakersStart : MonoBehaviour
                         }
                         masterSpeaker.clip.SetData(sample, lastPos);
                         AudioEchoFilter MasterEcho = masterSpeaker.GetComponent<AudioEchoFilter>();
-                        float Mastdist = Vector3.Distance(masterSpeaker.transform.position, playerListener.transform.position) * 1.142f;
+                        float Mastdist = UnityEngine.Vector3.Distance(masterSpeaker.transform.position, playerListener.transform.position) * 1.142f;
                         MasterEcho.delay = Mastdist;
                         if (!masterSpeaker.isPlaying) { masterSpeaker.Play(); }
-                    }
-                    if (playerXAbs > 40f)
-                    {
-                        float vol = Map(playerXAbs, 40.0001f, 90f, 0.01f, 0.79f);
-                        AudioListener.volume = 0.49f + (Mathf.Log10(vol) / -4.0f);//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
-                                                                                  //Debug.Log(AudioListener.volume);
-                        vol = Map(playerXAbs, 40.0001f, 76f, 0.0001f, 1.0f);
-                        playerListernerLowPass.cutoffFrequency = 4000 + ((Mathf.Log10(vol) / -4.0f) * 16000f);
-
-                    }
-                    else
-                    {
-                        //float vol2 = Map(40.001f, 40.0001f, 90f, 0.004f, 1.0f);
-                        //AudioListener.volume = Mathf.Log10(vol) / -4.0f;//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
-                        //Debug.Log(Mathf.Log10(vol2) / -4.0f);
-                        AudioListener.volume = 1.0f;
-                        playerListernerLowPass.cutoffFrequency = 22000f;
                     }
                     if (playerListener.head.position.x != -105.5 && (playerXAbs > 72))
                     {
@@ -854,6 +869,20 @@ public class Rhand
     public float[] left;
     public float[] up;
     public float[] forward;
+}
+
+[System.Serializable]
+public class MatchEvent
+{
+    public string EventTypeName;
+    public EventData[] Data;
+}
+
+[System.Serializable]
+public class EventData
+{
+    public string Key;
+    public string Value;
 }
 
 [System.Serializable]

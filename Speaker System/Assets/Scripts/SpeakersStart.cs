@@ -21,7 +21,7 @@ using System.Diagnostics;
 
 public class SpeakersStart : MonoBehaviour
 {
-    string VERSION_TAGNAME = "v0.3.1";
+    string VERSION_TAGNAME = "v0.3.2";
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern System.IntPtr GetActiveWindow();
@@ -29,7 +29,8 @@ public class SpeakersStart : MonoBehaviour
     [DllImport("WinAudioDLL", CallingConvention = CallingConvention.Cdecl)]
     private static extern void GetAudioEndpointInfo(StringBuilder str, int len);
 
-    public AudioEndpoints GetAudioInfo() {
+    public AudioEndpoints GetAudioInfo()
+    {
         StringBuilder str = new StringBuilder(16000);
 
         GetAudioEndpointInfo(str, 16000);
@@ -65,6 +66,7 @@ public class SpeakersStart : MonoBehaviour
     string appExeName = "";
     string originalAppEndpoint = "";
     bool wasAppEndpointChanged = false;
+    public bool hasCleanedUp = false;
     List<AppEndpoint> originalAppEndpoints = new List<AppEndpoint>();
     AudioSource masterSpeaker;
     List<AudioSource> speakers = new List<AudioSource>();
@@ -73,11 +75,12 @@ public class SpeakersStart : MonoBehaviour
     List<AudioEchoFilter> speakerFilters = new List<AudioEchoFilter>();
 
     string latestReleaseURL = "";
+    string latestReleaseVer = "";
     int speakerCount = 18;
     bool reverseLoopOrder;
     SpatialPlayerListener playerListener;
     AudioListener playerAudioListener;
-    AudioLowPassFilter playerListernerLowPass; 
+    AudioLowPassFilter playerListernerLowPass;
     Dropdown.OptionData AudioInputData, AppSelectionData;
     AudioEndpoints audioEndpointsJson = null;
     List<Dropdown.OptionData> AudioInputMessages = new List<Dropdown.OptionData>();
@@ -86,19 +89,19 @@ public class SpeakersStart : MonoBehaviour
     int AudioInputIndex, AppSelectionIndex;
     GameObject VACDownloadBtnGameObject, UpdateDownloadBtnGameObject;
     Button MSSettingsBtn, VACDownloadBtn, UpdateDownloadBtn, RefreshAppListBtn;
-    string VACInputName = "(Virtual Audio Cable)"; 
+    string VACInputName = "(Virtual Audio Cable)";
     const int FREQUENCY = 48000;
     AudioClip mic;
     int lastPos, pos;
     int loops;
     bool respawnResetDone;
- 
+
     // Use this for initialization
-    void Start () {
-        
+    void Start()
+    {
+
         Application.targetFrameRate = 25;
         QualitySettings.vSyncCount = 0;
-        StartCoroutine(GetLatestVer());        
 
         inputName = PlayerPrefs.GetString("InputName", "Line 1 (Virtual Audio Cable)");
         appExeName = PlayerPrefs.GetString("AppSourceName", "");
@@ -115,19 +118,26 @@ public class SpeakersStart : MonoBehaviour
 
         RefreshAppListBtn = GameObject.Find("RefreshAppListBtn").GetComponent<Button>();
 
-        MSSettingsBtn.onClick.AddListener(delegate {
+        MSSettingsBtn.onClick.AddListener(delegate
+        {
             OpenWinAppAudioSettings();
         });
 
-        RefreshAppListBtn.onClick.AddListener(delegate {
+        RefreshAppListBtn.onClick.AddListener(delegate
+        {
             refreshAppList();
         });
         GameObject playerObject = GameObject.Find("Player Listener");
         playerListener = playerObject.GetComponent<SpatialPlayerListener>();
+        if (!playerListener.isIgniteBotEmbedded)
+        {
+            StartCoroutine(GetLatestVer());
+        }
         playerAudioListener = playerObject.GetComponent<AudioListener>();
         playerListernerLowPass = playerAudioListener.GetComponent<AudioLowPassFilter>();
         masterSpeaker = GameObject.Find("Speaker 1").GetComponent<AudioSource>();
-        for(int i = 2; i <= speakerCount; i++){
+        for (int i = 2; i <= speakerCount; i++)
+        {
             speakers.Add(GameObject.Find("Speaker " + i).GetComponent<AudioSource>());
         }
         bool defaultFound = false;
@@ -139,50 +149,59 @@ public class SpeakersStart : MonoBehaviour
             AudioInputMessages.Add(AudioInputData);
             AudioInputDropdown.options.Add(AudioInputData);
             AudioInputIndex = AudioInputMessages.Count - 1;
-            if(device == inputName){
+            if (device == inputName)
+            {
                 defaultFound = true;
                 AudioInputDropdown.value = AudioInputIndex;
             }
-            if(device.Contains(VACInputName)){
+            if (device.Contains(VACInputName))
+            {
                 VACFound = true;
             }
             UnityEngine.Debug.Log("Name: " + device);
         }
-        
-        AudioInputDropdown.onValueChanged.AddListener(delegate {
+
+        AudioInputDropdown.onValueChanged.AddListener(delegate
+        {
             InputDropdownValueChanged(AudioInputDropdown);
         });
-        AppSelectionDropdown.onValueChanged.AddListener(delegate {
+        AppSelectionDropdown.onValueChanged.AddListener(delegate
+        {
             AppSelectionDropdownValueChanged(AppSelectionDropdown);
         });
         refreshAppList();
-        if(!defaultFound && !VACFound){
+        if (!defaultFound && !VACFound)
+        {
             Error("Couldn't find audio device " + inputName + ". Make sure to install Virtual Audio Cable and set the output device of your music source to " + inputName + " in the Windows settings under 'App Volume and Device Settings'.", "Error");
             VACDownloadBtnGameObject.SetActive(true);
-                VACDownloadBtn.onClick.AddListener(delegate {
+            VACDownloadBtn.onClick.AddListener(delegate
+            {
                 OpenVACDownload();
             });
         }
 
-        sourceInit(); 
+        sourceInit();
     }
 
-    void sourceInit(){
-        
+    void sourceInit()
+    {
+
         mic = Microphone.Start(inputName, true, 300, FREQUENCY);
         reverseLoopOrder = false;
         loops = 0;
         var clip = AudioClip.Create("test", 300 * FREQUENCY, 1, FREQUENCY, false);
         masterSpeaker.clip = clip;
         masterSpeaker.loop = true;
-        foreach(AudioSource aSource in speakers){
+        foreach (AudioSource aSource in speakers)
+        {
             aSource.clip = clip;
             aSource.loop = true;
         }
         StartCoroutine(SyncSourcesInit());
     }
 
-    void refreshAppList(){
+    void refreshAppList()
+    {
         isAppListRefreshing = true;
         bool pastSelectedAppFound = false;
         audioEndpointsJson = GetAudioInfo();
@@ -195,21 +214,25 @@ public class SpeakersStart : MonoBehaviour
         AppSelectionDropdown.captionText.text = "Select App to Be Played";
         foreach (var endpoint in audioEndpointsJson.endpoints)
         {
-            foreach(var session in endpoint.sessions){
-                if(!AppSelectionMessages.Any(m => m.text == session.exeName) && session.exeName != "Echo Speaker System" && session.exeName != "NVIDIA RTX Voice"){
+            foreach (var session in endpoint.sessions)
+            {
+                if (!AppSelectionMessages.Any(m => m.text == session.exeName) && session.exeName != "Echo Speaker System" && session.exeName != "NVIDIA RTX Voice")
+                {
                     AppSelectionData = new Dropdown.OptionData();
                     AppSelectionData.text = session.exeName;
                     AppSelectionMessages.Add(AppSelectionData);
                     AppSelectionDropdown.options.Add(AppSelectionData);
                     AppSelectionIndex = AppSelectionMessages.Count - 1;
-                    if(session.exeName == appExeName){
+                    if (session.exeName == appExeName)
+                    {
                         pastSelectedAppFound = true;
                         AppSelectionDropdown.value = AppSelectionIndex;
                     }
                 }
             }
         }
-        if(!pastSelectedAppFound){
+        if (!pastSelectedAppFound)
+        {
             AppSelectionDropdown.value = 0;
         }
         AppSelectionDropdown.enabled = false;
@@ -217,137 +240,172 @@ public class SpeakersStart : MonoBehaviour
         AppSelectionDropdown.RefreshShownValue();
         isAppListRefreshing = false;
     }
-   
+
     // Update is called once per frame
-    void FixedUpdate () {
+    void FixedUpdate()
+    {
         //m_MyAudioSource = GetComponent<AudioSource>();
-        if((pos = Microphone.GetPosition(inputName)) > (FREQUENCY /2)-1){
-            if(lastPos > pos)    lastPos = 0;
- 
-            if(pos - lastPos > 0){
-                float playerXAbs = Math.Abs(playerListener.head.position.x);
-                // Allocate the space for the sample.
-                float[] sample = new float[(pos - lastPos) * 1];
- 
-                // Get the data from microphone.
-                mic.GetData(sample, lastPos);
-                float highest = 0.0f;
-                for(int i = 0; i < sample.Length; i++){
-                    if(sample[i] > highest){
-                        highest = sample[i];
-                    }
-                    sample[i] = sample[i] * 1.95f;
-                    if(sample[i] > 1.0f){
-                        UnityEngine.Debug.Log(sample[i]);
-                        sample[i] = 1.0f;
-                    }
-                }
-                
-                if(!reverseLoopOrder){
-                    foreach(AudioSource aSource in speakers){
-                        aSource.clip.SetData(sample, lastPos);
-                        AudioEchoFilter echo = aSource.GetComponent<AudioEchoFilter>();
-                        float dist = Vector3.Distance(aSource.transform.position, playerListener.transform.position) *1.142f;
-                        echo.delay = dist;
-                        // if(loops > 300){
-                        //     aSource.Pause();
-                        // }
-                        if(!aSource.isPlaying){aSource.Play();}
-                        reverseLoopOrder = true;
-                    }
-                    masterSpeaker.clip.SetData(sample, lastPos);
-                    AudioEchoFilter MasterEcho = masterSpeaker.GetComponent<AudioEchoFilter>();
-                    float Mastdist = Vector3.Distance(masterSpeaker.transform.position, playerListener.transform.position) *1.142f;;
-                    MasterEcho.delay = Mastdist;
-                if(!masterSpeaker.isPlaying){masterSpeaker.Play();}
-                }else{
-                    foreach(AudioSource aSource in Enumerable.Reverse(speakers)){
-                        aSource.clip.SetData(sample, lastPos);
-                        AudioEchoFilter echo = aSource.GetComponent<AudioEchoFilter>();
-                        float dist = Vector3.Distance(aSource.transform.position, playerListener.transform.position) *1.142f;
-                        echo.delay = dist;
-                        // if(loops > 300){
-                        //     aSource.Pause();
-                        // }
-                        if(!aSource.isPlaying){aSource.Play();}
-                        //aSource.timeSamples = masterSpeaker.timeSamples;
-                        reverseLoopOrder = false;
-                    }
-                    masterSpeaker.clip.SetData(sample, lastPos);
-                    AudioEchoFilter MasterEcho = masterSpeaker.GetComponent<AudioEchoFilter>();
-                    float Mastdist = Vector3.Distance(masterSpeaker.transform.position, playerListener.transform.position) *1.142f;
-                    MasterEcho.delay = Mastdist;
-                if(!masterSpeaker.isPlaying){masterSpeaker.Play();}
-                }
-                if(playerXAbs > 40f){
-                    float vol = Map(playerXAbs, 40.0001f, 90f, 0.01f, 0.79f);
-                    AudioListener.volume = 0.49f + (Mathf.Log10(vol) / -4.0f);//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
-                    //Debug.Log(AudioListener.volume);
-                    vol = Map(playerXAbs, 40.0001f, 76f, 0.0001f, 1.0f);
-                    playerListernerLowPass.cutoffFrequency = 4000 +((Mathf.Log10(vol) / -4.0f) * 16000f);
-                    
-                }else{
-                    //float vol2 = Map(40.001f, 40.0001f, 90f, 0.004f, 1.0f);
-                    //AudioListener.volume = Mathf.Log10(vol) / -4.0f;//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
-                    //Debug.Log(Mathf.Log10(vol2) / -4.0f);
-                    AudioListener.volume = 1.0f;
-                    playerListernerLowPass.cutoffFrequency = 22000f;
-                }
-                if(playerListener.head.position.x != -105.5 && (playerXAbs > 72)){
-                    if(!respawnResetDone){
-                        StartCoroutine(SyncSources());
-                        respawnResetDone = true;
-                    }
-                }else{
-                    respawnResetDone = false;
-                }
-                if(loops > 36000){
-                    StartCoroutine(SyncSources());
-                }else{
-                    loops ++;
-                }
- 
-                // Put the data in the audio source.
-                
- 
-                lastPos = pos;  
-            }
+        if (playerListener.quitCalled)
+        {
+            Cleanup();
         }
-        
-        // foreach(AudioSource aSource in speakers){
-        //     //aSource.clip.SetData(sample, lastPos);
-        //     // if(loops > 300){
-        //     //     aSource.Pause();
-        //     // }
-        //     //if(!aSource.isPlaying){aSource.Play();}
-        //     aSource.timeSamples = masterSpeaker.timeSamples;
-        //     //reverseLoopOrder = true;
-        // }
+        else
+        {
+            if (!hasCleanedUp && (pos = Microphone.GetPosition(inputName)) > (FREQUENCY / 2) - 1)
+            {
+                if (lastPos > pos) lastPos = 0;
+
+                if (pos - lastPos > 0)
+                {
+                    float playerXAbs = Math.Abs(playerListener.head.position.x);
+                    // Allocate the space for the sample.
+                    float[] sample = new float[(pos - lastPos) * 1];
+
+                    // Get the data from microphone.
+                    mic.GetData(sample, lastPos);
+                    float highest = 0.0f;
+                    for (int i = 0; i < sample.Length; i++)
+                    {
+                        if (sample[i] > highest)
+                        {
+                            highest = sample[i];
+                        }
+                        sample[i] = sample[i] * 1.95f;
+                        if (sample[i] > 1.0f)
+                        {
+                            UnityEngine.Debug.Log(sample[i]);
+                            sample[i] = 1.0f;
+                        }
+                    }
+
+                    if (!reverseLoopOrder)
+                    {
+                        foreach (AudioSource aSource in speakers)
+                        {
+                            aSource.clip.SetData(sample, lastPos);
+                            AudioEchoFilter echo = aSource.GetComponent<AudioEchoFilter>();
+                            float dist = Vector3.Distance(aSource.transform.position, playerListener.transform.position) * 1.142f;
+                            echo.delay = dist;
+                            // if(loops > 300){
+                            //     aSource.Pause();
+                            // }
+                            if (!aSource.isPlaying) { aSource.Play(); }
+                            reverseLoopOrder = true;
+                        }
+                        masterSpeaker.clip.SetData(sample, lastPos);
+                        AudioEchoFilter MasterEcho = masterSpeaker.GetComponent<AudioEchoFilter>();
+                        float Mastdist = Vector3.Distance(masterSpeaker.transform.position, playerListener.transform.position) * 1.142f; ;
+                        MasterEcho.delay = Mastdist;
+                        if (!masterSpeaker.isPlaying) { masterSpeaker.Play(); }
+                    }
+                    else
+                    {
+                        foreach (AudioSource aSource in Enumerable.Reverse(speakers))
+                        {
+                            aSource.clip.SetData(sample, lastPos);
+                            AudioEchoFilter echo = aSource.GetComponent<AudioEchoFilter>();
+                            float dist = Vector3.Distance(aSource.transform.position, playerListener.transform.position) * 1.142f;
+                            echo.delay = dist;
+                            // if(loops > 300){
+                            //     aSource.Pause();
+                            // }
+                            if (!aSource.isPlaying) { aSource.Play(); }
+                            //aSource.timeSamples = masterSpeaker.timeSamples;
+                            reverseLoopOrder = false;
+                        }
+                        masterSpeaker.clip.SetData(sample, lastPos);
+                        AudioEchoFilter MasterEcho = masterSpeaker.GetComponent<AudioEchoFilter>();
+                        float Mastdist = Vector3.Distance(masterSpeaker.transform.position, playerListener.transform.position) * 1.142f;
+                        MasterEcho.delay = Mastdist;
+                        if (!masterSpeaker.isPlaying) { masterSpeaker.Play(); }
+                    }
+                    if (playerXAbs > 40f)
+                    {
+                        float vol = Map(playerXAbs, 40.0001f, 90f, 0.01f, 0.79f);
+                        AudioListener.volume = 0.49f + (Mathf.Log10(vol) / -4.0f);//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
+                                                                                  //Debug.Log(AudioListener.volume);
+                        vol = Map(playerXAbs, 40.0001f, 76f, 0.0001f, 1.0f);
+                        playerListernerLowPass.cutoffFrequency = 4000 + ((Mathf.Log10(vol) / -4.0f) * 16000f);
+
+                    }
+                    else
+                    {
+                        //float vol2 = Map(40.001f, 40.0001f, 90f, 0.004f, 1.0f);
+                        //AudioListener.volume = Mathf.Log10(vol) / -4.0f;//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
+                        //Debug.Log(Mathf.Log10(vol2) / -4.0f);
+                        AudioListener.volume = 1.0f;
+                        playerListernerLowPass.cutoffFrequency = 22000f;
+                    }
+                    if (playerListener.head.position.x != -105.5 && (playerXAbs > 72))
+                    {
+                        if (!respawnResetDone)
+                        {
+                            StartCoroutine(SyncSources());
+                            respawnResetDone = true;
+                        }
+                    }
+                    else
+                    {
+                        respawnResetDone = false;
+                    }
+                    if (loops > 36000)
+                    {
+                        StartCoroutine(SyncSources());
+                    }
+                    else
+                    {
+                        loops++;
+                    }
+
+                    // Put the data in the audio source.
+
+
+                    lastPos = pos;
+                }
+            }
+
+            // foreach(AudioSource aSource in speakers){
+            //     //aSource.clip.SetData(sample, lastPos);
+            //     // if(loops > 300){
+            //     //     aSource.Pause();
+            //     // }
+            //     //if(!aSource.isPlaying){aSource.Play();}
+            //     aSource.timeSamples = masterSpeaker.timeSamples;
+            //     //reverseLoopOrder = true;
+            // }
+        }
     }
 
     void InputDropdownValueChanged(Dropdown change)
     {
-        if(!isAppListRefreshing){
+        if (!isAppListRefreshing)
+        {
             var newInput = AudioInputDropdown.options[AudioInputDropdown.value].text;
             var audioCableOutput = audioEndpointsJson.endpoints.FirstOrDefault(e => e.name == newInput);
-            
-            if(audioCableOutput == null){
+
+            if (audioCableOutput == null)
+            {
                 AppSelectionDropdown.interactable = false;
                 var session = audioEndpointsJson.endpoints
                 .SelectMany(e => e.sessions)
                 .Where(s => s.exeName == appExeName)
                 .FirstOrDefault();
-                if(session != null){
+                if (session != null)
+                {
                     StartCoroutine(resetAppToOriginalEndpoint(session.processId));
                 }
-            }else{
+            }
+            else
+            {
                 AppSelectionDropdown.interactable = true;
-                if(AppSelectionDropdown.value != 0){
+                if (AppSelectionDropdown.value != 0)
+                {
                     var session = audioEndpointsJson.endpoints
                     .SelectMany(e => e.sessions)
                     .Where(s => s.exeName == appExeName)
                     .FirstOrDefault();
-                    if(session != null){
+                    if (session != null)
+                    {
                         StartCoroutine(setAppToVAC(session.processId, newInput, false));
                     }
                 }
@@ -378,23 +436,27 @@ public class SpeakersStart : MonoBehaviour
                     StartCoroutine(resetAppToOriginalEndpoint(oldSession.processId));
                 }
             }
-            if(AppSelectionDropdown.value == 0){
+            if (AppSelectionDropdown.value == 0)
+            {
                 appExeName = "";
                 PlayerPrefs.SetString("AppSourceName", appExeName);
                 PlayerPrefs.Save();
-            }else{
+            }
+            else
+            {
                 PlayerPrefs.SetString("AppSourceName", newAppSource);
                 PlayerPrefs.Save();
                 appExeName = newAppSource;
-                    var newSession = audioEndpointsJson.endpoints
-                    .SelectMany(e => e.sessions)
-                    .Where(s => s.exeName == appExeName)
-                    .FirstOrDefault();
-                    if(newSession != null){
-                        StartCoroutine(setAppToVAC(newSession.processId, inputName));
-                        Microphone.End(inputName);
-                        sourceInit();
-                    }
+                var newSession = audioEndpointsJson.endpoints
+                .SelectMany(e => e.sessions)
+                .Where(s => s.exeName == appExeName)
+                .FirstOrDefault();
+                if (newSession != null)
+                {
+                    StartCoroutine(setAppToVAC(newSession.processId, inputName));
+                    Microphone.End(inputName);
+                    sourceInit();
+                }
             }
         }
     }
@@ -405,7 +467,23 @@ public class SpeakersStart : MonoBehaviour
     }
     void DownloadLatestRelease()
     {
-        Application.OpenURL(latestReleaseURL);
+        try
+        {
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Normal;
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = "/C \"" + Application.streamingAssetsPath + "\\InstallEchoSpeakerSystem.bat\" " + latestReleaseURL + " " + latestReleaseVer + " 1";
+            startInfo.Verb = "runas";
+            startInfo.UseShellExecute = true;
+            process.StartInfo = startInfo;
+            process.Start();
+            Application.Quit();
+        }
+        catch
+        {
+
+        }
         UpdateDownloadBtnGameObject.SetActive(false);
     }
     void OpenVACDownload()
@@ -423,27 +501,48 @@ public class SpeakersStart : MonoBehaviour
         }
         loops = 0;
     }
+    private IEnumerator ResetAudio()
+    {
+        //  while (true)
+        Microphone.End(inputName);
+        //PlayerPrefs.SetString("InputName", newInput);
+        //PlayerPrefs.Save();
+        //inputName = newInput;
+        sourceInit();
+        yield return null;
+        // //  {
+        //      foreach (AudioSource aSource in speakers)
+        //      {
+        //          aSource.timeSamples = masterSpeaker.timeSamples;
+        //          yield return null;
+        //      }
+        //      loops = 0;
+        //  }    
+    }
     private IEnumerator SyncSources()
-     {
+    {
         //  while (true)
         //  {
-             foreach (AudioSource aSource in speakers)
-             {
-                 aSource.timeSamples = masterSpeaker.timeSamples;
-                 yield return null;
-             }
-             loops = 0;
+        foreach (AudioSource aSource in speakers)
+        {
+            aSource.timeSamples = masterSpeaker.timeSamples;
+            yield return null;
+        }
+        loops = 0;
         //  }    
-     } 
+    }
 
-private IEnumerator setAppToVAC(int procID, string input, bool retainOriginalEndpoint = true)
-     {
+    private IEnumerator setAppToVAC(int procID, string input, bool retainOriginalEndpoint = true)
+    {
         var audioCableOutput = audioEndpointsJson.endpoints.FirstOrDefault(e => e.name == input);
-        if(audioCableOutput != null){
-            Process AudioSwitch = new Process {
-                StartInfo = new ProcessStartInfo {
-                    FileName = ( Application.streamingAssetsPath+"\\AudioSwitch.exe"), 
-                    Arguments = procID + " \""+ audioCableOutput.id + "\"",
+        if (audioCableOutput != null)
+        {
+            Process AudioSwitch = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = (Application.streamingAssetsPath + "\\AudioSwitch.exe"),
+                    Arguments = procID + " \"" + audioCableOutput.id + "\"",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardInput = true,
@@ -455,57 +554,36 @@ private IEnumerator setAppToVAC(int procID, string input, bool retainOriginalEnd
             AudioSwitch.Start();
             AudioSwitch.WaitForExit(900);
             string line = AudioSwitch.StandardOutput.ReadLine();
-            if(AudioSwitch.ExitCode == 0){
+            if (AudioSwitch.ExitCode == 0)
+            {
                 wasAppEndpointChanged = true;
-                if(retainOriginalEndpoint){
-                    if(string.IsNullOrWhiteSpace(line)){
-                        originalAppEndpoints.Add(new AppEndpoint{processId = procID, originalEndpointID = ""});
-                    }else{
-                        originalAppEndpoints.Add(new AppEndpoint{processId = procID, originalEndpointID = line});
+                if (retainOriginalEndpoint)
+                {
+                    if (string.IsNullOrWhiteSpace(line))
+                    {
+                        originalAppEndpoints.Add(new AppEndpoint { processId = procID, originalEndpointID = "" });
+                    }
+                    else
+                    {
+                        originalAppEndpoints.Add(new AppEndpoint { processId = procID, originalEndpointID = line });
                     }
                 }
             }
         }
         StartCoroutine(SyncSources());
         yield return null;
-     }
-     private IEnumerator resetAppToOriginalEndpoint(int procID)
-     {
-            AppEndpoint originalEndpoint = originalAppEndpoints.FirstOrDefault(appEP => appEP.processId == procID);
-            if(originalEndpoint != null){
-                Process AudioSwitch = new Process {
-                    StartInfo = new ProcessStartInfo {
-                        FileName = ( Application.streamingAssetsPath+"\\AudioSwitch.exe"), 
-                        Arguments = procID + " \""+ originalEndpoint.originalEndpointID + "\"",
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        RedirectStandardInput = true,
-                        RedirectStandardError = true,
-                        CreateNoWindow = true
-                    }
-
-                };
-                AudioSwitch.Start();
-                AudioSwitch.WaitForExit(900);
-                wasAppEndpointChanged = false;
-                originalAppEndpoint = "";
-                originalAppEndpoints.Remove(originalEndpoint);
-            }
-        yield return null;
-     }
- 
-    void OnDestroy(){
-        Microphone.End(inputName);
-        if(wasAppEndpointChanged){
-                var Originalsession = audioEndpointsJson.endpoints
-            .SelectMany(e => e.sessions)
-            .Where(s => s.exeName == appExeName)
-            .FirstOrDefault();
-        if(Originalsession != null){
-            Process AudioSwitch = new Process {
-                StartInfo = new ProcessStartInfo {
-                    FileName = ( Application.streamingAssetsPath+"\\AudioSwitch.exe"), 
-                    Arguments = Originalsession.processId + " \""+ originalAppEndpoint + "\"",
+    }
+    private IEnumerator resetAppToOriginalEndpoint(int procID)
+    {
+        AppEndpoint originalEndpoint = originalAppEndpoints.FirstOrDefault(appEP => appEP.processId == procID);
+        if (originalEndpoint != null)
+        {
+            Process AudioSwitch = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = (Application.streamingAssetsPath + "\\AudioSwitch.exe"),
+                    Arguments = procID + " \"" + originalEndpoint.originalEndpointID + "\"",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardInput = true,
@@ -518,37 +596,103 @@ private IEnumerator setAppToVAC(int procID, string input, bool retainOriginalEnd
             AudioSwitch.WaitForExit(900);
             wasAppEndpointChanged = false;
             originalAppEndpoint = "";
-            }
-    }
+            originalAppEndpoints.Remove(originalEndpoint);
+        }
+        yield return null;
     }
 
+    void OnApplicationQuit()
+    {
+        try
+        {
+            Cleanup();
+
+        }
+        catch (Exception ex)
+        {
+            UnityEngine.Debug.Log("Disconnect failed");
+        }
+    }
+
+    void Cleanup()
+    {
+        try
+        {
+            if (!hasCleanedUp)
+            {
+                playerListener.Cleanup();
+                Microphone.End(inputName);
+                if (wasAppEndpointChanged)
+                {
+                    var Originalsession = audioEndpointsJson.endpoints
+                .SelectMany(e => e.sessions)
+                .Where(s => s.exeName == appExeName)
+                .FirstOrDefault();
+                    if (Originalsession != null)
+                    {
+                        Process AudioSwitch = new Process
+                        {
+                            StartInfo = new ProcessStartInfo
+                            {
+                                FileName = (Application.streamingAssetsPath + "\\AudioSwitch.exe"),
+                                Arguments = Originalsession.processId + " \"" + originalAppEndpoint + "\"",
+                                UseShellExecute = false,
+                                RedirectStandardOutput = true,
+                                RedirectStandardInput = true,
+                                RedirectStandardError = true,
+                                CreateNoWindow = true
+                            }
+
+                        };
+                        AudioSwitch.Start();
+                        AudioSwitch.WaitForExit(900);
+                        wasAppEndpointChanged = false;
+                        originalAppEndpoint = "";
+                        hasCleanedUp = true;
+                    }
+                }
+            }
+        }
+        catch (Exception ex) { }
+    }
     IEnumerator GetLatestVer()
     {
         using (UnityWebRequest webRequest = UnityWebRequest.Get("https://api.github.com/repos/iblowatsports/Echo-VR-Speaker-System/releases/latest"))
         {
             // Request and wait for the desired page. 73
-            yield return webRequest.SendWebRequest();
-
-            if (webRequest.isNetworkError)
+            try
             {
-            }
-            else{
-                string resp = webRequest.downloadHandler.text;
-                VersionJson latestVersion = JsonUtility.FromJson<VersionJson>(resp);
-                if(latestVersion.tag_name != VERSION_TAGNAME){
-                    latestReleaseURL = latestVersion.assets[0].browser_download_url;
-                    UpdateDownloadBtn.onClick.AddListener(delegate {
-                        DownloadLatestRelease();
-                    });
-                    UpdateDownloadBtnGameObject.SetActive(true);
+                yield return webRequest.SendWebRequest();
+
+                if (webRequest.isNetworkError)
+                {
                 }
+                else
+                {
+                    string resp = webRequest.downloadHandler.text;
+                    VersionJson latestVersion = JsonUtility.FromJson<VersionJson>(resp);
+                    if (latestVersion.tag_name != VERSION_TAGNAME)
+                    {
+                        latestReleaseVer = latestVersion.tag_name;
+                        latestReleaseURL = latestVersion.assets.First(url => url.browser_download_url.EndsWith("zip")).browser_download_url;
+                        UpdateDownloadBtn.onClick.AddListener(delegate
+                        {
+                            DownloadLatestRelease();
+                        });
+                        UpdateDownloadBtnGameObject.SetActive(true);
+                    }
+                }
+            }
+            catch
+            {
+
             }
         }
     }
 
     float Map(float s, float a1, float a2, float b1, float b2)
     {
-        return b1 + (s-a1)*(b2-b1)/(a2-a1);
+        return b1 + (s - a1) * (b2 - b1) / (a2 - a1);
     }
 }
 [System.Serializable]

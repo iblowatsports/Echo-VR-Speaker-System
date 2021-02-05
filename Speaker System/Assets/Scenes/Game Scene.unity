@@ -100,7 +100,7 @@ LightmapSettings:
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 112000000, guid: a530d7df96fd6064695938479becb73a,
     type: 2}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -230,7 +230,7 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 38939491}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
   m_RoomHF: -698
@@ -286,7 +286,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -401,25 +401,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
-  indirectBinaural: 0
+  reflections: 1
+  indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.6
+  simulationType: 1
+  uniqueIdentifier: Speaker 3
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
-  bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 684b0000
+  bakedDataSize: 19304
+  bakedStatsFoldout: 1
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: 719422039
     type: 0
 --- !u!1 &46171191
 GameObject:
@@ -973,25 +974,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
+  reflections: 1
   indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.8
+  simulationType: 1
+  uniqueIdentifier: Speaker18
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 684b0000
+  bakedDataSize: 19304
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: 1823701129
     type: 0
 --- !u!164 &261338529
 AudioReverbFilter:
@@ -1000,14 +1002,14 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 261338527}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
-  m_RoomHF: -1000
-  m_DecayTime: 10.05
-  m_DecayHFRatio: 0.23
-  m_ReflectionsLevel: -602
-  m_ReverbLevel: 198
+  m_RoomHF: -698
+  m_DecayTime: 7.24
+  m_DecayHFRatio: 0.33
+  m_ReflectionsLevel: -1166
+  m_ReverbLevel: 16
   m_ReverbDelay: 0.03
   m_Diffusion: 100
   m_Density: 100
@@ -1015,7 +1017,7 @@ AudioReverbFilter:
   m_RoomLF: 0
   m_LFReference: 250
   m_ReflectionsDelay: 0
-  m_ReverbPreset: 11
+  m_ReverbPreset: 10
 --- !u!82 &261338530
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1035,7 +1037,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -1209,7 +1211,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -1308,7 +1310,7 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 274170904}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
   m_RoomHF: -698
@@ -1347,25 +1349,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
+  reflections: 1
   indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.6
+  simulationType: 1
+  uniqueIdentifier: Speaker8
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 684b0000
+  bakedDataSize: 19304
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: -1860790535
     type: 0
 --- !u!1 &282840810
 GameObject:
@@ -1709,7 +1712,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -1820,7 +1823,7 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 311028542}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
   m_RoomHF: -698
@@ -1859,25 +1862,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
+  reflections: 1
   indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.6
+  simulationType: 1
+  uniqueIdentifier: Speaker 2
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 1c710000
+  bakedDataSize: 28956
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: -1354369839
     type: 0
 --- !u!1 &314011335
 GameObject:
@@ -1940,7 +1944,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -2039,7 +2043,7 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 314011335}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
   m_RoomHF: -698
@@ -2078,25 +2082,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
-  indirectBinaural: 0
+  reflections: 1
+  indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.6
+  simulationType: 1
+  uniqueIdentifier: Speaker6
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 684b0000
+  bakedDataSize: 19304
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: 92057008
     type: 0
 --- !u!1 &340608993
 GameObject:
@@ -2191,6 +2196,137 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 340608993}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &378674228
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 378674234}
+  - component: {fileID: 378674233}
+  - component: {fileID: 378674232}
+  - component: {fileID: 378674231}
+  - component: {fileID: 378674230}
+  - component: {fileID: 378674229}
+  m_Layer: 0
+  m_Name: Plane (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &378674229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378674228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43300f764e354d642abf0f0dbb612011, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Preset: 2
+  Value:
+    LowFreqAbsorption: 0.05
+    MidFreqAbsorption: 0.07
+    HighFreqAbsorption: 0.08
+    Scattering: 0.05
+    LowFreqTransmission: 0.015
+    MidFreqTransmission: 0.002
+    HighFreqTransmission: 0.001
+--- !u!114 &378674230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378674228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79e99846fd75c4438917229c144155a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TerrainSimplificationLevel: 0
+  exportAllChildren: 0
+--- !u!64 &378674231
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378674228}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &378674232
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378674228}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &378674233
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378674228}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &378674234
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 378674228}
+  m_LocalRotation: {x: -0.5, y: -0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: -40, y: 15, z: 0}
+  m_LocalScale: {x: 16.090809, y: 1, z: 7.75491}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 29
+  m_LocalEulerAnglesHint: {x: -90, y: -90, z: 0}
 --- !u!1 &402529028
 GameObject:
   m_ObjectHideFlags: 0
@@ -2235,25 +2371,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
-  indirectBinaural: 0
+  reflections: 1
+  indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.6
+  simulationType: 1
+  uniqueIdentifier: Speaker9
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: b4250000
+  bakedDataSize: 9652
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: 1240524148
     type: 0
 --- !u!164 &402529030
 AudioReverbFilter:
@@ -2262,7 +2399,7 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 402529028}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
   m_RoomHF: -698
@@ -2318,7 +2455,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -2475,25 +2612,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
+  reflections: 1
   indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.8
+  simulationType: 1
+  uniqueIdentifier: Speaker13
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 684b0000
+  bakedDataSize: 19304
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: -1277889234
     type: 0
 --- !u!164 &437989800
 AudioReverbFilter:
@@ -2502,14 +2640,14 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 437989796}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
-  m_RoomHF: -1000
-  m_DecayTime: 10.05
-  m_DecayHFRatio: 0.23
-  m_ReflectionsLevel: -602
-  m_ReverbLevel: 198
+  m_RoomHF: -698
+  m_DecayTime: 7.24
+  m_DecayHFRatio: 0.33
+  m_ReflectionsLevel: -1166
+  m_ReverbLevel: 16
   m_ReverbDelay: 0.03
   m_Diffusion: 100
   m_Density: 100
@@ -2517,7 +2655,7 @@ AudioReverbFilter:
   m_RoomLF: 0
   m_LFReference: 250
   m_ReflectionsDelay: 0
-  m_ReverbPreset: 11
+  m_ReverbPreset: 10
 --- !u!82 &437989801
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2537,7 +2675,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -3111,6 +3249,249 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 481354991}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &495753163
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 495753164}
+  - component: {fileID: 495753165}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &495753164
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 495753163}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 23, z: 0}
+  m_LocalScale: {x: 81.34261, y: 65.15246, z: 107.010025}
+  m_Children: []
+  m_Father: {fileID: 2016333255}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &495753165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 495753163}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9ea38fb6afe48f4d8a095ea13565fa0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  placementStrategy: 2
+  horizontalSpacing: 27.2
+  heightAboveFloor: 1.5
+  maxNumTriangles: 64
+  maxOctreeDepth: 2
+  dataSize: 445212
+  probeSpherePoints:
+  - -27.2
+  - 50.5
+  - -40.800003
+  - -27.2
+  - -8.631596
+  - -40.800003
+  - -27.2
+  - 50.5
+  - -13.600003
+  - -27.2
+  - -8.631592
+  - -13.600003
+  - -27.2
+  - 50.5
+  - 13.5999975
+  - -27.2
+  - -8.631596
+  - 13.5999975
+  - -27.2
+  - 50.5
+  - 40.800003
+  - -27.2
+  - -8.631599
+  - 40.800003
+  - 0
+  - 50.5
+  - -40.800003
+  - 0
+  - -8.631592
+  - -40.800003
+  - 0
+  - 50.5
+  - -13.600003
+  - 0
+  - -8.631588
+  - -13.600003
+  - 0
+  - 50.5
+  - 13.5999975
+  - 0
+  - -8.631592
+  - 13.5999975
+  - 0
+  - 50.5
+  - 40.800003
+  - 0
+  - -8.631592
+  - 40.800003
+  - 27.2
+  - 50.5
+  - -40.800003
+  - 27.2
+  - -8.631596
+  - -40.800003
+  - 27.2
+  - 50.5
+  - -13.600003
+  - 27.2
+  - -8.631592
+  - -13.600003
+  - 27.2
+  - 50.5
+  - 13.5999975
+  - 27.2
+  - -8.631596
+  - 13.5999975
+  - 27.2
+  - 50.5
+  - 40.800003
+  - 27.2
+  - -8.631599
+  - 40.800003
+  probeSphereRadii:
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  - 27.2
+  dataLayerInfo:
+  - name: Speaker 3
+    identifier:
+      identifier: 719422039
+      type: 0
+    size: 19304
+  - name: Speaker18
+    identifier:
+      identifier: 1823701129
+      type: 0
+    size: 19304
+  - name: Speaker8
+    identifier:
+      identifier: -1860790535
+      type: 0
+    size: 19304
+  - name: Speaker 2
+    identifier:
+      identifier: -1354369839
+      type: 0
+    size: 28956
+  - name: Speaker6
+    identifier:
+      identifier: 92057008
+      type: 0
+    size: 19304
+  - name: Speaker9
+    identifier:
+      identifier: 1240524148
+      type: 0
+    size: 9652
+  - name: Speaker13
+    identifier:
+      identifier: -1277889234
+      type: 0
+    size: 19304
+  - name: Speaker7
+    identifier:
+      identifier: 1283577396
+      type: 0
+    size: 28956
+  - name: Speaker11
+    identifier:
+      identifier: 1195264750
+      type: 0
+    size: 19304
+  - name: Speaker10
+    identifier:
+      identifier: -1405593955
+      type: 0
+    size: 9652
+  - name: Speaker14
+    identifier:
+      identifier: 1463756943
+      type: 0
+    size: 19304
+  - name: Speaker 1
+    identifier:
+      identifier: -942906872
+      type: 0
+    size: 19304
+  - name: Speaker17
+    identifier:
+      identifier: 1787929511
+      type: 0
+    size: 19304
+  - name: Speaker4
+    identifier:
+      identifier: 1825529548
+      type: 0
+    size: 9652
+  - name: Speaker15
+    identifier:
+      identifier: -326833026
+      type: 0
+    size: 19304
+  - name: Speaker5
+    identifier:
+      identifier: 1299511430
+      type: 0
+    size: 9652
+  - name: Speaker16
+    identifier:
+      identifier: -341850592
+      type: 0
+    size: 19304
+  - name: Speaker12
+    identifier:
+      identifier: 736314494
+      type: 0
+    size: 19304
+  - name: reverb
+    identifier:
+      identifier: 0
+      type: 2
+    size: 115824
 --- !u!1 &500641066
 GameObject:
   m_ObjectHideFlags: 0
@@ -3247,6 +3628,137 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 502883789}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &564609621
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 564609622}
+  - component: {fileID: 564609627}
+  - component: {fileID: 564609626}
+  - component: {fileID: 564609625}
+  - component: {fileID: 564609624}
+  - component: {fileID: 564609623}
+  m_Layer: 0
+  m_Name: Plane (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &564609622
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 564609621}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 15, z: 40}
+  m_LocalScale: {x: 11.92, y: 1, z: 7.754911}
+  m_Children: []
+  m_Father: {fileID: 2016333255}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!114 &564609623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 564609621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43300f764e354d642abf0f0dbb612011, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Preset: 2
+  Value:
+    LowFreqAbsorption: 0.05
+    MidFreqAbsorption: 0.07
+    HighFreqAbsorption: 0.08
+    Scattering: 0.05
+    LowFreqTransmission: 0.015
+    MidFreqTransmission: 0.002
+    HighFreqTransmission: 0.001
+--- !u!114 &564609624
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 564609621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79e99846fd75c4438917229c144155a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TerrainSimplificationLevel: 0
+  exportAllChildren: 0
+--- !u!64 &564609625
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 564609621}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &564609626
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 564609621}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &564609627
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 564609621}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &582385622
 GameObject:
   m_ObjectHideFlags: 0
@@ -4668,7 +5180,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -4779,7 +5291,7 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 853595505}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
   m_RoomHF: -698
@@ -4818,25 +5330,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
-  indirectBinaural: 0
+  reflections: 1
+  indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.6
+  simulationType: 1
+  uniqueIdentifier: Speaker7
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 1c710000
+  bakedDataSize: 28956
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: 1283577396
     type: 0
 --- !u!1 &861813548
 GameObject:
@@ -4974,25 +5487,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
+  reflections: 1
   indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.8
+  simulationType: 1
+  uniqueIdentifier: Speaker11
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 684b0000
+  bakedDataSize: 19304
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: 1195264750
     type: 0
 --- !u!164 &869765545
 AudioReverbFilter:
@@ -5001,14 +5515,14 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 869765543}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
-  m_RoomHF: -1000
-  m_DecayTime: 10.05
-  m_DecayHFRatio: 0.23
-  m_ReflectionsLevel: -602
-  m_ReverbLevel: 198
+  m_RoomHF: -698
+  m_DecayTime: 7.24
+  m_DecayHFRatio: 0.33
+  m_ReflectionsLevel: -1166
+  m_ReverbLevel: 16
   m_ReverbDelay: 0.03
   m_Diffusion: 100
   m_Density: 100
@@ -5016,7 +5530,7 @@ AudioReverbFilter:
   m_RoomLF: 0
   m_LFReference: 250
   m_ReflectionsDelay: 0
-  m_ReverbPreset: 11
+  m_ReverbPreset: 10
 --- !u!82 &869765546
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5036,7 +5550,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -5629,25 +6143,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
-  indirectBinaural: 0
+  reflections: 1
+  indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.6
+  simulationType: 1
+  uniqueIdentifier: Speaker10
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: b4250000
+  bakedDataSize: 9652
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: -1405593955
     type: 0
 --- !u!164 &971938349
 AudioReverbFilter:
@@ -5656,7 +6171,7 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 971938347}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
   m_RoomHF: -698
@@ -5712,7 +6227,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -5854,25 +6369,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
+  reflections: 1
   indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.8
+  simulationType: 1
+  uniqueIdentifier: Speaker14
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 684b0000
+  bakedDataSize: 19304
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: 1463756943
     type: 0
 --- !u!164 &976725281
 AudioReverbFilter:
@@ -5881,14 +6397,14 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 976725279}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
-  m_RoomHF: -1000
-  m_DecayTime: 10.05
-  m_DecayHFRatio: 0.23
-  m_ReflectionsLevel: -602
-  m_ReverbLevel: 198
+  m_RoomHF: -698
+  m_DecayTime: 7.24
+  m_DecayHFRatio: 0.33
+  m_ReflectionsLevel: -1166
+  m_ReverbLevel: 16
   m_ReverbDelay: 0.03
   m_Diffusion: 100
   m_Density: 100
@@ -5896,7 +6412,7 @@ AudioReverbFilter:
   m_RoomLF: 0
   m_LFReference: 250
   m_ReflectionsDelay: 0
-  m_ReverbPreset: 11
+  m_ReverbPreset: 10
 --- !u!82 &976725282
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5916,7 +6432,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -6255,6 +6771,7 @@ GameObject:
   - component: {fileID: 1015268151}
   - component: {fileID: 1015268152}
   - component: {fileID: 1015268153}
+  - component: {fileID: 1015268154}
   m_Layer: 0
   m_Name: Player Listener
   m_TagString: Untagged
@@ -6312,6 +6829,10 @@ MonoBehaviour:
   headForward: {x: 0, y: 0, z: 0}
   headUp: {x: 0, y: 0, z: 0}
   head: {fileID: 1015268150}
+  isIgniteBotEmbedded: 1
+  addr: tcp://localhost:12345
+  quitCalled: 0
+  hasCleanedUp: 0
 --- !u!169 &1015268153
 AudioLowPassFilter:
   m_ObjectHideFlags: 0
@@ -6337,6 +6858,158 @@ AudioLowPassFilter:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1015268154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1015268148}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 052d599a015141b47a4d10676f2dac29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useAllProbeBoxes: 1
+  probeBoxes: []
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 70c40100
+  bakedDataSize: 115824
+  bakedStatsFoldout: 1
+  bakeToggle: 1
+  currentStaticListenerNode: {fileID: 0}
+--- !u!1 &1016562222
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1016562223}
+  - component: {fileID: 1016562228}
+  - component: {fileID: 1016562227}
+  - component: {fileID: 1016562226}
+  - component: {fileID: 1016562225}
+  - component: {fileID: 1016562224}
+  m_Layer: 0
+  m_Name: Plane (3)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1016562223
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016562222}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 49, z: 0}
+  m_LocalScale: {x: 11.92, y: 1, z: 27.608618}
+  m_Children: []
+  m_Father: {fileID: 2016333255}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1016562224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016562222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43300f764e354d642abf0f0dbb612011, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Preset: 5
+  Value:
+    LowFreqAbsorption: 0.24
+    MidFreqAbsorption: 0.69
+    HighFreqAbsorption: 0.73
+    Scattering: 0.05
+    LowFreqTransmission: 0.02
+    MidFreqTransmission: 0.005
+    HighFreqTransmission: 0.003
+--- !u!114 &1016562225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016562222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79e99846fd75c4438917229c144155a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TerrainSimplificationLevel: 0
+  exportAllChildren: 0
+--- !u!64 &1016562226
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016562222}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &1016562227
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016562222}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &1016562228
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016562222}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1037811925
 GameObject:
   m_ObjectHideFlags: 0
@@ -7207,7 +7880,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -7306,7 +7979,7 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1266729863}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
   m_RoomHF: -698
@@ -7345,25 +8018,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
+  reflections: 1
   indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.6
+  simulationType: 1
+  uniqueIdentifier: Speaker 1
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 684b0000
+  bakedDataSize: 19304
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: -942906872
     type: 0
 --- !u!1 &1285664503
 GameObject:
@@ -7833,7 +8507,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Download Update
+  m_Text: Install Update
 --- !u!222 &1416505744
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8337,6 +9011,137 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1507042017}
   m_CullTransparentMesh: 0
+--- !u!1 &1511972993
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1511972994}
+  - component: {fileID: 1511972999}
+  - component: {fileID: 1511972998}
+  - component: {fileID: 1511972997}
+  - component: {fileID: 1511972996}
+  - component: {fileID: 1511972995}
+  m_Layer: 0
+  m_Name: Plane
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1511972994
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511972993}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: -10.131592, z: 0}
+  m_LocalScale: {x: 11.92, y: 1, z: 18.96239}
+  m_Children: []
+  m_Father: {fileID: 2016333255}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1511972995
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511972993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43300f764e354d642abf0f0dbb612011, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Preset: 4
+  Value:
+    LowFreqAbsorption: 0.6
+    MidFreqAbsorption: 0.7
+    HighFreqAbsorption: 0.8
+    Scattering: 0.05
+    LowFreqTransmission: 0.031
+    MidFreqTransmission: 0.012
+    HighFreqTransmission: 0.008
+--- !u!114 &1511972996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511972993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79e99846fd75c4438917229c144155a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TerrainSimplificationLevel: 0
+  exportAllChildren: 0
+--- !u!64 &1511972997
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511972993}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &1511972998
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511972993}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &1511972999
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1511972993}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1517161884
 GameObject:
   m_ObjectHideFlags: 0
@@ -8468,25 +9273,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
+  reflections: 1
   indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.8
+  simulationType: 1
+  uniqueIdentifier: Speaker17
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 684b0000
+  bakedDataSize: 19304
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: 1787929511
     type: 0
 --- !u!164 &1536621131
 AudioReverbFilter:
@@ -8495,14 +9301,14 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1536621127}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
-  m_RoomHF: -1000
-  m_DecayTime: 10.05
-  m_DecayHFRatio: 0.23
-  m_ReflectionsLevel: -602
-  m_ReverbLevel: 198
+  m_RoomHF: -698
+  m_DecayTime: 7.24
+  m_DecayHFRatio: 0.33
+  m_ReflectionsLevel: -1166
+  m_ReverbLevel: 16
   m_ReverbDelay: 0.03
   m_Diffusion: 100
   m_Density: 100
@@ -8510,7 +9316,7 @@ AudioReverbFilter:
   m_RoomLF: 0
   m_LFReference: 250
   m_ReflectionsDelay: 0
-  m_ReverbPreset: 11
+  m_ReverbPreset: 10
 --- !u!82 &1536621132
 AudioSource:
   m_ObjectHideFlags: 0
@@ -8530,7 +9336,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -9099,25 +9905,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
-  indirectBinaural: 0
+  reflections: 1
+  indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.6
+  simulationType: 1
+  uniqueIdentifier: Speaker4
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: b4250000
+  bakedDataSize: 9652
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: 1825529548
     type: 0
 --- !u!164 &1678412014
 AudioReverbFilter:
@@ -9126,7 +9933,7 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1678412012}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
   m_RoomHF: -698
@@ -9182,7 +9989,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -9522,6 +10329,137 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1772330285}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1778966097
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1778966103}
+  - component: {fileID: 1778966102}
+  - component: {fileID: 1778966101}
+  - component: {fileID: 1778966100}
+  - component: {fileID: 1778966099}
+  - component: {fileID: 1778966098}
+  m_Layer: 0
+  m_Name: Plane (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1778966098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778966097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43300f764e354d642abf0f0dbb612011, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Preset: 2
+  Value:
+    LowFreqAbsorption: 0.05
+    MidFreqAbsorption: 0.07
+    HighFreqAbsorption: 0.08
+    Scattering: 0.05
+    LowFreqTransmission: 0.015
+    MidFreqTransmission: 0.002
+    HighFreqTransmission: 0.001
+--- !u!114 &1778966099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778966097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79e99846fd75c4438917229c144155a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TerrainSimplificationLevel: 0
+  exportAllChildren: 0
+--- !u!64 &1778966100
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778966097}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &1778966101
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778966097}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &1778966102
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778966097}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1778966103
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778966097}
+  m_LocalRotation: {x: -0.5, y: 0.5, z: 0.5, w: 0.5}
+  m_LocalPosition: {x: 40, y: 15, z: 0}
+  m_LocalScale: {x: 18.44024, y: 1, z: 7.75491}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 28
+  m_LocalEulerAnglesHint: {x: -90, y: 90, z: 0}
 --- !u!1 &1781634630
 GameObject:
   m_ObjectHideFlags: 0
@@ -9566,25 +10504,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
+  reflections: 1
   indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.8
+  simulationType: 1
+  uniqueIdentifier: Speaker15
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 684b0000
+  bakedDataSize: 19304
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: -326833026
     type: 0
 --- !u!164 &1781634632
 AudioReverbFilter:
@@ -9593,14 +10532,14 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1781634630}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
-  m_RoomHF: -1000
-  m_DecayTime: 10.05
-  m_DecayHFRatio: 0.23
-  m_ReflectionsLevel: -602
-  m_ReverbLevel: 198
+  m_RoomHF: -698
+  m_DecayTime: 7.24
+  m_DecayHFRatio: 0.33
+  m_ReflectionsLevel: -1166
+  m_ReverbLevel: 16
   m_ReverbDelay: 0.03
   m_Diffusion: 100
   m_Density: 100
@@ -9608,7 +10547,7 @@ AudioReverbFilter:
   m_RoomLF: 0
   m_LFReference: 250
   m_ReflectionsDelay: 0
-  m_ReverbPreset: 11
+  m_ReverbPreset: 10
 --- !u!82 &1781634633
 AudioSource:
   m_ObjectHideFlags: 0
@@ -9628,7 +10567,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -9889,25 +10828,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
-  indirectBinaural: 0
+  reflections: 1
+  indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.6
+  simulationType: 1
+  uniqueIdentifier: Speaker5
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: b4250000
+  bakedDataSize: 9652
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: 1299511430
     type: 0
 --- !u!164 &1789904638
 AudioReverbFilter:
@@ -9916,7 +10856,7 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1789904636}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
   m_RoomHF: -698
@@ -9972,7 +10912,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -10056,14 +10996,145 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1789904636}
-  m_LocalRotation: {x: 0.14452665, y: 0.37797198, z: -0.059864894, w: 0.9125051}
+  m_LocalRotation: {x: 0.22350667, y: 0.3713161, z: -0.09257949, w: 0.8964364}
   m_LocalPosition: {x: -46, y: 10, z: -27}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 188788379}
   m_Father: {fileID: 0}
   m_RootOrder: 12
-  m_LocalEulerAnglesHint: {x: 18, y: 45, z: 0}
+  m_LocalEulerAnglesHint: {x: 28, y: 45, z: 0}
+--- !u!1 &1800125979
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1800125980}
+  - component: {fileID: 1800125985}
+  - component: {fileID: 1800125984}
+  - component: {fileID: 1800125983}
+  - component: {fileID: 1800125982}
+  - component: {fileID: 1800125981}
+  m_Layer: 0
+  m_Name: Plane (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1800125980
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800125979}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 15, z: -40}
+  m_LocalScale: {x: 11.92, y: 1, z: 7.754911}
+  m_Children: []
+  m_Father: {fileID: 2016333255}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!114 &1800125981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800125979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43300f764e354d642abf0f0dbb612011, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Preset: 2
+  Value:
+    LowFreqAbsorption: 0.05
+    MidFreqAbsorption: 0.07
+    HighFreqAbsorption: 0.08
+    Scattering: 0.05
+    LowFreqTransmission: 0.015
+    MidFreqTransmission: 0.002
+    HighFreqTransmission: 0.001
+--- !u!114 &1800125982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800125979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79e99846fd75c4438917229c144155a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TerrainSimplificationLevel: 0
+  exportAllChildren: 0
+--- !u!64 &1800125983
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800125979}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &1800125984
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800125979}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &1800125985
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800125979}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1812748521
 GameObject:
   m_ObjectHideFlags: 0
@@ -10237,25 +11308,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
+  reflections: 1
   indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.8
+  simulationType: 1
+  uniqueIdentifier: Speaker16
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 684b0000
+  bakedDataSize: 19304
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: -341850592
     type: 0
 --- !u!164 &1839028469
 AudioReverbFilter:
@@ -10264,14 +11336,14 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1839028467}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
-  m_RoomHF: -1000
-  m_DecayTime: 10.05
-  m_DecayHFRatio: 0.23
-  m_ReflectionsLevel: -602
-  m_ReverbLevel: 198
+  m_RoomHF: -698
+  m_DecayTime: 7.24
+  m_DecayHFRatio: 0.33
+  m_ReflectionsLevel: -1166
+  m_ReverbLevel: 16
   m_ReverbDelay: 0.03
   m_Diffusion: 100
   m_Density: 100
@@ -10279,7 +11351,7 @@ AudioReverbFilter:
   m_RoomLF: 0
   m_LFReference: 250
   m_ReflectionsDelay: 0
-  m_ReverbPreset: 11
+  m_ReverbPreset: 10
 --- !u!82 &1839028470
 AudioSource:
   m_ObjectHideFlags: 0
@@ -10299,7 +11371,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0
@@ -10595,6 +11667,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Source1: {fileID: 0}
+  hasCleanedUp: 0
 --- !u!1 &1923616719
 GameObject:
   m_ObjectHideFlags: 0
@@ -10994,6 +12067,41 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 26
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2016333254
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2016333255}
+  m_Layer: 0
+  m_Name: ReverbWalls
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2016333255
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2016333254}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 1511972994}
+  - {fileID: 564609622}
+  - {fileID: 1800125980}
+  - {fileID: 1016562223}
+  - {fileID: 495753164}
+  m_Father: {fileID: 0}
+  m_RootOrder: 27
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2016997527
 GameObject:
@@ -11513,25 +12621,26 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 0
+  reflections: 1
   indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
-  indirectMixLevel: 1
-  simulationType: 0
-  uniqueIdentifier: 
+  indirectMixLevel: 0.8
+  simulationType: 1
+  uniqueIdentifier: Speaker12
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 16
-  useAllProbeBoxes: 0
+  bakingRadius: 40
+  useAllProbeBoxes: 1
   probeBoxes: []
-  bakedProbeNames: []
-  bakedProbeDataSizes: 
-  bakedDataSize: 0
+  bakedProbeNames:
+  - GameObject
+  bakedProbeDataSizes: 684b0000
+  bakedDataSize: 19304
   bakedStatsFoldout: 0
-  bakeToggle: 0
+  bakeToggle: 1
   bakedDataIdentifier:
-    identifier: 0
+    identifier: 736314494
     type: 0
 --- !u!164 &2133106068
 AudioReverbFilter:
@@ -11540,14 +12649,14 @@ AudioReverbFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2133106066}
-  m_Enabled: 1
+  m_Enabled: 0
   m_DryLevel: 0
   m_Room: -1000
-  m_RoomHF: -1000
-  m_DecayTime: 10.05
-  m_DecayHFRatio: 0.23
-  m_ReflectionsLevel: -602
-  m_ReverbLevel: 198
+  m_RoomHF: -698
+  m_DecayTime: 7.24
+  m_DecayHFRatio: 0.33
+  m_ReflectionsLevel: -1166
+  m_ReverbLevel: 16
   m_ReverbDelay: 0.03
   m_Diffusion: 100
   m_Density: 100
@@ -11555,7 +12664,7 @@ AudioReverbFilter:
   m_RoomLF: 0
   m_LFReference: 250
   m_ReflectionsDelay: 0
-  m_ReverbPreset: 11
+  m_ReverbPreset: 10
 --- !u!82 &2133106069
 AudioSource:
   m_ObjectHideFlags: 0
@@ -11575,7 +12684,7 @@ AudioSource:
   Spatialize: 1
   SpatializePostEffects: 1
   Priority: 0
-  DopplerLevel: 0.15
+  DopplerLevel: 0.05
   MinDistance: 10
   MaxDistance: 120
   Pan2D: 0

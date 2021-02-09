@@ -124,6 +124,7 @@ public class SpeakersStart : MonoBehaviour
         AudioInputDropdown.ClearOptions();
         AppSelectionDropdown = GameObject.Find("AppSelectionDropdown").GetComponent<Dropdown>();
         MSSettingsBtn = GameObject.Find("OpenMSAppAudioSettingsBtn").GetComponent<Button>();
+        GameObject.Find("OpenMSAppAudioSettingsBtn").SetActive(false);
         VACDownloadBtnGameObject = GameObject.Find("OpenVACDownloadBtn");
         VACDownloadBtn = VACDownloadBtnGameObject.GetComponent<Button>();
         VACDownloadBtnGameObject.SetActive(false);
@@ -199,6 +200,7 @@ public class SpeakersStart : MonoBehaviour
             if (args[i].Contains("selectinput"))
             {
                 ShowHideInputDropdown(true);
+                GameObject.Find("OpenMSAppAudioSettingsBtn").SetActive(true);
                 break;
             }
             if (args[i].Contains("reset"))

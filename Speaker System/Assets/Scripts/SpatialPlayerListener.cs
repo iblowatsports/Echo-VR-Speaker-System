@@ -32,6 +32,7 @@ public class SpatialPlayerListener : MonoBehaviour
     bool isClientSpectator = false;
     public bool quitCalled = false;
     public bool hasCleanedUp = false;
+    public bool speakersReady = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -183,16 +184,17 @@ public class SpatialPlayerListener : MonoBehaviour
         }
         else
         {
-            if (!isIgniteBotEmbedded)
-            {
-                StartCoroutine(GetRequest());
-            }
+            if(speakersReady){
+                if (!isIgniteBotEmbedded)
+                {
+                    StartCoroutine(GetRequest());
+                }
 
-            playerObject.transform.position = new Vector3(_playerHeadPosition[2], _playerHeadPosition[1], _playerHeadPosition[0]);
-            headUp = new Vector3(_playerHeadUp[2], _playerHeadUp[1], _playerHeadUp[0]);
-            headForward = new Vector3(_playerHeadForward[2], _playerHeadForward[1], _playerHeadForward[0]);
-            playerObject.transform.LookAt(headForward + transform.position, headUp);
-            
+                playerObject.transform.position = new Vector3(_playerHeadPosition[2], _playerHeadPosition[1], _playerHeadPosition[0]);
+                headUp = new Vector3(_playerHeadUp[2], _playerHeadUp[1], _playerHeadUp[0]);
+                headForward = new Vector3(_playerHeadForward[2], _playerHeadForward[1], _playerHeadForward[0]);
+                playerObject.transform.LookAt(headForward + transform.position, headUp);
+            }
         }
     }
 

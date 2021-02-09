@@ -100,7 +100,7 @@ LightmapSettings:
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 112000000, guid: a530d7df96fd6064695938479becb73a,
     type: 2}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -410,7 +410,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -983,7 +983,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -1358,7 +1358,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -1382,8 +1382,6 @@ GameObject:
   - component: {fileID: 282840813}
   - component: {fileID: 282840811}
   - component: {fileID: 282840816}
-  - component: {fileID: 282840812}
-  - component: {fileID: 282840815}
   - component: {fileID: 282840817}
   - component: {fileID: 282840818}
   m_Layer: 0
@@ -1401,18 +1399,6 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 282840810}
   m_Enabled: 0
---- !u!114 &282840812
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 282840810}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6547d18b2bc62c94aa5ec1e87434da4e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!20 &282840813
 Camera:
   m_ObjectHideFlags: 0
@@ -1470,18 +1456,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 37.27, y: 179.21, z: -0.001}
---- !u!114 &282840815
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 282840810}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fbcbd10ef1cd8243b85d5270627d6c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &282840816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1871,7 +1845,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -2091,7 +2065,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -2380,13 +2354,12 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
-  useAllProbeBoxes: 1
+  bakingRadius: 10
+  useAllProbeBoxes: 0
   probeBoxes: []
-  bakedProbeNames:
-  - GameObject
-  bakedProbeDataSizes: b4250000
-  bakedDataSize: 9652
+  bakedProbeNames: []
+  bakedProbeDataSizes: 
+  bakedDataSize: 0
   bakedStatsFoldout: 0
   bakeToggle: 1
   bakedDataIdentifier:
@@ -2621,7 +2594,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -3297,7 +3270,7 @@ MonoBehaviour:
   heightAboveFloor: 1.5
   maxNumTriangles: 64
   maxOctreeDepth: 2
-  dataSize: 445212
+  dataSize: 406540
   probeSpherePoints:
   - -27.2
   - 50.5
@@ -3422,16 +3395,6 @@ MonoBehaviour:
       identifier: 92057008
       type: 0
     size: 19304
-  - name: Speaker9
-    identifier:
-      identifier: 1240524148
-      type: 0
-    size: 9652
-  - name: Speaker13
-    identifier:
-      identifier: -1277889234
-      type: 0
-    size: 19304
   - name: Speaker7
     identifier:
       identifier: 1283577396
@@ -3442,11 +3405,6 @@ MonoBehaviour:
       identifier: 1195264750
       type: 0
     size: 19304
-  - name: Speaker10
-    identifier:
-      identifier: -1405593955
-      type: 0
-    size: 9652
   - name: Speaker14
     identifier:
       identifier: 1463756943
@@ -3457,34 +3415,9 @@ MonoBehaviour:
       identifier: -942906872
       type: 0
     size: 19304
-  - name: Speaker17
-    identifier:
-      identifier: 1787929511
-      type: 0
-    size: 19304
-  - name: Speaker4
-    identifier:
-      identifier: 1825529548
-      type: 0
-    size: 9652
   - name: Speaker15
     identifier:
       identifier: -326833026
-      type: 0
-    size: 19304
-  - name: Speaker5
-    identifier:
-      identifier: 1299511430
-      type: 0
-    size: 9652
-  - name: Speaker16
-    identifier:
-      identifier: -341850592
-      type: 0
-    size: 19304
-  - name: Speaker12
-    identifier:
-      identifier: 736314494
       type: 0
     size: 19304
   - name: reverb
@@ -3492,6 +3425,31 @@ MonoBehaviour:
       identifier: 0
       type: 2
     size: 115824
+  - name: Speaker4
+    identifier:
+      identifier: 1825529548
+      type: 0
+    size: 9652
+  - name: Speaker5
+    identifier:
+      identifier: 1299511430
+      type: 0
+    size: 9652
+  - name: Speaker13
+    identifier:
+      identifier: -1277889234
+      type: 0
+    size: 19304
+  - name: Speaker12
+    identifier:
+      identifier: 736314494
+      type: 0
+    size: 19304
+  - name: Speaker16
+    identifier:
+      identifier: -341850592
+      type: 0
+    size: 19304
 --- !u!1 &500641066
 GameObject:
   m_ObjectHideFlags: 0
@@ -5339,7 +5297,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -5496,7 +5454,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -6152,13 +6110,12 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
-  useAllProbeBoxes: 1
+  bakingRadius: 10
+  useAllProbeBoxes: 0
   probeBoxes: []
-  bakedProbeNames:
-  - GameObject
-  bakedProbeDataSizes: b4250000
-  bakedDataSize: 9652
+  bakedProbeNames: []
+  bakedProbeDataSizes: 
+  bakedDataSize: 0
   bakedStatsFoldout: 0
   bakeToggle: 1
   bakedDataIdentifier:
@@ -6378,7 +6335,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -6834,6 +6791,7 @@ MonoBehaviour:
   addr: tcp://localhost:12345
   quitCalled: 0
   hasCleanedUp: 0
+  speakersReady: 0
 --- !u!169 &1015268153
 AudioLowPassFilter:
   m_ObjectHideFlags: 0
@@ -8028,7 +7986,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -9283,13 +9241,12 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
-  useAllProbeBoxes: 1
+  bakingRadius: 10
+  useAllProbeBoxes: 0
   probeBoxes: []
-  bakedProbeNames:
-  - GameObject
-  bakedProbeDataSizes: 684b0000
-  bakedDataSize: 19304
+  bakedProbeNames: []
+  bakedProbeDataSizes: 
+  bakedDataSize: 0
   bakedStatsFoldout: 0
   bakeToggle: 1
   bakedDataIdentifier:
@@ -9906,7 +9863,7 @@ MonoBehaviour:
   sourceRadius: 1
   occlusionSamples: 16
   directMixLevel: 1
-  reflections: 1
+  reflections: 0
   indirectBinaural: 1
   physicsBasedAttenuationForIndirect: 1
   indirectMixLevel: 0.6
@@ -9915,7 +9872,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -10514,7 +10471,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -10838,14 +10795,14 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
   - GameObject
   bakedProbeDataSizes: b4250000
   bakedDataSize: 9652
-  bakedStatsFoldout: 0
+  bakedStatsFoldout: 1
   bakeToggle: 1
   bakedDataIdentifier:
     identifier: 1299511430
@@ -11318,7 +11275,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -11497,7 +11454,7 @@ GameObject:
   - component: {fileID: 1858140118}
   - component: {fileID: 1858140117}
   m_Layer: 5
-  m_Name: Label
+  m_Name: AudioSourceDropdownLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11667,9 +11624,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 034fbd32a887ca647a425aac7b9a5e6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VERSION_TAGNAME: v0.3.3
+  VERSION_TAGNAME: v0.3.4
   Source1: {fileID: 0}
   hasCleanedUp: 0
+  speedOfSoundMultiplier: 1.19
+  reverbLevel: 1
+  noReverb: 0
+  useSteamReverb: 0
 --- !u!1 &1923616719
 GameObject:
   m_ObjectHideFlags: 0
@@ -12632,7 +12593,7 @@ MonoBehaviour:
   avoidSilenceDuringInit: 0
   overrideHRTFIndex: 0
   hrtfIndex: 0
-  bakingRadius: 40
+  bakingRadius: 10
   useAllProbeBoxes: 1
   probeBoxes: []
   bakedProbeNames:
@@ -12772,7 +12733,7 @@ Transform:
   m_GameObject: {fileID: 2133106066}
   m_LocalRotation: {x: 0.341968, y: 0.016399939, z: -0.0059690876, w: 0.9395495}
   m_LocalPosition: {x: 11, y: 35, z: -34}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 0.99999994}
   m_Children:
   - {fileID: 340608994}
   m_Father: {fileID: 0}

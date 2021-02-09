@@ -24,7 +24,7 @@ using System.ComponentModel;
 
 public class SpeakersStart : MonoBehaviour
 {
-    public string VERSION_TAGNAME = "v0.3.4";
+    public string VERSION_TAGNAME = "v0.3.5";
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern System.IntPtr GetActiveWindow();
@@ -78,7 +78,7 @@ public class SpeakersStart : MonoBehaviour
     Dictionary<string,AudioReverbFilter> speakerReverbs = new Dictionary<string, AudioReverbFilter>();
 
     AudioEchoFilter masterSpeakerEcho;
-    List<SteamAudioSource> steamAudioSpeakers = new List<SteamAudioSource>();
+    Dictionary<string,SteamAudioSource> steamAudioSpeakers = new Dictionary<string,SteamAudioSource>();
     public float speedOfSoundMultiplier = 1.19f;
     public float reverbLevel = 1.0f;
     public bool noReverb = false;
@@ -153,23 +153,30 @@ public class SpeakersStart : MonoBehaviour
         steamAudioListener = playerAudioListener.GetComponent<SteamAudioListener>();
         playerListernerLowPass = playerAudioListener.GetComponent<AudioLowPassFilter>();
         masterSpeaker = GameObject.Find("Speaker 1").GetComponent<AudioSource>();
+        
         speakerDelays.Add(masterSpeaker.name, UnityEngine.Random.Range(0.92f,1.08f));
         speakerEchos.Add(masterSpeaker.name, masterSpeaker.GetComponent<AudioEchoFilter>());
         for (int i = 2; i <= speakerCount; i++)
         {
             AudioSource speaker = GameObject.Find("Speaker " + i).GetComponent<AudioSource>();
             speakers.Add(speaker);
+            float random = UnityEngine.Random.Range(0.92f,1.08f);
             speakerDelays.Add(speaker.name, UnityEngine.Random.Range(0.92f,1.08f));
             speakerEchos.Add(speaker.name, speaker.GetComponent<AudioEchoFilter>());
         }
         for (int i = 1; i <= speakerCount; i++)
         {
-            steamAudioSpeakers.Add(GameObject.Find("Speaker " + i).GetComponent<SteamAudioSource>());
+            steamAudioSpeakers.Add("Speaker " + i, GameObject.Find("Speaker " + i).GetComponent<SteamAudioSource>());
             speakerReverbs.Add("Speaker " + i, GameObject.Find("Speaker " + i).GetComponent<AudioReverbFilter>());
         }
-        foreach (SteamAudioSource steamSource in steamAudioSpeakers)
+        foreach (var steamSourcePair in steamAudioSpeakers)
         {
-            steamSource.reflections = useSteamReverb;
+            steamSourcePair.Value.reflections = useSteamReverb;
+            float rand = UnityEngine.Random.Range(0.85f,1.15f);
+            steamSourcePair.Value.dipolePower *= rand;
+            rand = ((rand - 1.0f) * -1f) + 1.0f;
+            GameObject.Find(steamSourcePair.Key).GetComponent<AudioDistortionFilter>().distortionLevel *= rand;
+            steamSourcePair.Value.dipoleWeight *= UnityEngine.Random.Range(0.85f,1.15f);            
         }
         foreach(AudioReverbFilter reverb in speakerReverbs.Values){
             reverb.enabled = !noReverb;
@@ -421,7 +428,7 @@ public class SpeakersStart : MonoBehaviour
                             AudioListener.volume = 0.49f + (Mathf.Log10(vol) / -4.0f);//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
                                                                                     //Debug.Log(AudioListener.volume);
                             if(useSteamReverb){
-                                foreach (SteamAudioSource steamSource in steamAudioSpeakers)
+                                foreach (SteamAudioSource steamSource in steamAudioSpeakers.Values)
                                 {
                                     steamSource.indirectMixLevel = playerListener.isReverbMixChangeOn? AudioListener.volume * 1.0f : 1.0f;
                                 }
@@ -437,7 +444,7 @@ public class SpeakersStart : MonoBehaviour
                             //Debug.Log(Mathf.Log10(vol2) / -4.0f);
                             if(AudioListener.volume != 1.0f){
                                 if(useSteamReverb){
-                                    foreach (SteamAudioSource steamSource in steamAudioSpeakers)
+                                    foreach (SteamAudioSource steamSource in steamAudioSpeakers.Values)
                                     {
                                         steamSource.indirectMixLevel = 1.0f;
                                     }

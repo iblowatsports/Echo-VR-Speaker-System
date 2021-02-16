@@ -15,6 +15,7 @@ public class SpatialPlayerListener : MonoBehaviour
     static string echoVRPort = "6721";
     static string url = "http://" + echoVRIP + ":" + echoVRPort + "/session";
     public Vector3 headForward;
+    public bool goalScored = false;
     public Vector3 headUp;
     public Transform head;
     public bool isIgniteBotEmbedded = false;
@@ -94,6 +95,10 @@ public class SpatialPlayerListener : MonoBehaviour
                     MatchEvent eventMSG = JsonUtility.FromJson<MatchEvent>(messageReceived);
                     if(eventMSG.EventTypeName == "LeaveMatch"){
                         SetDefaultListenerPosition();
+                    }else if(eventMSG.EventTypeName == "GoalScored"){
+                        if(eventMSG.Data[0].Value == "True"){
+                            goalScored = true;
+                        }
                     }
                 }catch{}
             }
@@ -282,7 +287,7 @@ public class SpatialPlayerListener : MonoBehaviour
                     var currentFrameTime = Time.realtimeSinceStartup;
                     if ((currentFrameTime - lastAPITime) != 0)
                     {
-                        Debug.Log(String.Format("Frame receive rate: {0} hz", 1 / (currentFrameTime - lastAPITime)));
+                        //Debug.Log(String.Format("Frame receive rate: {0} hz", 1 / (currentFrameTime - lastAPITime)));
                     }
                     lastAPITime = currentFrameTime;
                     if (!found && tempPlayerName.Length > 0)

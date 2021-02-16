@@ -24,7 +24,7 @@ using System.ComponentModel;
 
 public class SpeakersStart : MonoBehaviour
 {
-    public string VERSION_TAGNAME = "v0.3.5";
+    public string VERSION_TAGNAME = "v0.4.0";
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern System.IntPtr GetActiveWindow();
@@ -63,29 +63,36 @@ public class SpeakersStart : MonoBehaviour
     }
 
     bool isAppListRefreshing = false;
+    bool isGoalHornFileValid = false;
     public AudioSource Source1;
     string inputName = "";
+    bool isGoalHornEnabled = true;
     bool isFirstAppInit = true;
     string appExeName = "";
     string originalAppEndpoint = "";
     bool wasAppEndpointChanged = false;
     public bool hasCleanedUp = false;
+    bool goalHornPlaying = false;
+
+    Toggle goalHornToggle;
     List<AppEndpoint> originalAppEndpoints = new List<AppEndpoint>();
     AudioSource masterSpeaker;
     List<AudioSource> speakers = new List<AudioSource>();
-    Dictionary<string,float> speakerDelays = new Dictionary<string, float>();
-    Dictionary<string,AudioEchoFilter> speakerEchos = new Dictionary<string, AudioEchoFilter>();
-    Dictionary<string,AudioReverbFilter> speakerReverbs = new Dictionary<string, AudioReverbFilter>();
+    Dictionary<string, float> speakerDelays = new Dictionary<string, float>();
+    Dictionary<string, AudioEchoFilter> speakerEchos = new Dictionary<string, AudioEchoFilter>();
+    Dictionary<string, AudioReverbFilter> speakerReverbs = new Dictionary<string, AudioReverbFilter>();
 
     AudioEchoFilter masterSpeakerEcho;
-    Dictionary<string,SteamAudioSource> steamAudioSpeakers = new Dictionary<string,SteamAudioSource>();
-    public float speedOfSoundMultiplier = 1.19f;
+    Dictionary<string, SteamAudioSource> steamAudioSpeakers = new Dictionary<string, SteamAudioSource>();
+    public float speedOfSoundMultiplier = 1.39f;
     public float reverbLevel = 1.0f;
+    int previousTimeSamples = 0;
     public bool noReverb = false;
     string latestReleaseURL = "";
     string latestReleaseVer = "";
     int speakerCount = 18;
     bool reverseLoopOrder;
+    float listenerVolume, goalHornClipVolMult = 0.0f;
     SpatialPlayerListener playerListener;
     SteamAudioListener steamAudioListener;
     public bool useSteamReverb = false;
@@ -101,30 +108,84 @@ public class SpeakersStart : MonoBehaviour
     Button MSSettingsBtn, VACDownloadBtn, UpdateDownloadBtn, RefreshAppListBtn;
     string VACInputName = "(Virtual Audio Cable)";
     const int FREQUENCY = 48000;
-    AudioClip mic;
+    AudioClip masterClip, goalHornClip;
+    float averageGoalHornLoudness, averageMusicLoudness, musicLoudnessAcc = 0.0f;
+    long musicLoudnessCount = 0;
     int lastPos, pos;
     int loops;
     bool respawnResetDone;
-    bool isReady = false;
+    bool isReady,clipZeroed,isNewUpdate = false;
     public static string updateFileName = "";
 
     // Use this for initialization
     void Start()
     {
-
-        Application.targetFrameRate = 25;
+        MSSettingsBtn = GameObject.Find("OpenMSAppAudioSettingsBtn").GetComponent<Button>();
+        isNewUpdate = PlayerPrefs.GetString("RunningVersion", "") != VERSION_TAGNAME;
+        StartCoroutine(GetWhatsNew());
+        GameObject.Find("OpenMSAppAudioSettingsBtn").SetActive(false);
+        string[] args = System.Environment.GetCommandLineArgs();
+        for (int i = 0; i < args.Length; i++)
+        {
+            if (args[i].Contains("selectinput"))
+            {
+                ShowHideInputDropdown(true);
+                GameObject.Find("OpenMSAppAudioSettingsBtn").SetActive(true);
+                break;
+            }
+            if (args[i].Contains("reset"))
+            {
+                PlayerPrefs.DeleteAll();
+                break;
+            }
+            // if (args[i].Contains("steamreverb"))
+            // {
+            //     PlayerPrefs.SetInt("SteamReverb", 1);
+            //     PlayerPrefs.Save();
+            //     useSteamReverb = true;
+            // }
+            // if (args[i].Contains("nosteamreverb"))
+            // {
+            //     PlayerPrefs.SetInt("SteamReverb", 0);
+            //     PlayerPrefs.Save();
+            //     useSteamReverb = false;
+            // }
+            if (args[i].Contains("noreverb"))
+            {
+                PlayerPrefs.SetInt("NoReverb", 1);
+                PlayerPrefs.Save();
+                noReverb = true;
+            }
+            if (args[i].Contains("reverb"))
+            {
+                PlayerPrefs.SetInt("NoReverb", 0);
+                PlayerPrefs.Save();
+                noReverb = false;
+            }
+        }
+        goalHornToggle = GameObject.Find("GoalHornToggle").GetComponent<Toggle>();
+        isGoalHornEnabled = PlayerPrefs.GetInt("GoalHornEnabled", 0) == 1;
+        goalHornToggle.isOn = isGoalHornEnabled;
+        goalHornToggle.onValueChanged.AddListener(delegate
+        {
+            GoalHornToggleValueChanged(goalHornToggle);
+        });
+        StartCoroutine(TryLoadGoalHornWav(isGoalHornEnabled));
+        Application.targetFrameRate = 30;
         QualitySettings.vSyncCount = 0;
-
+        
         inputName = PlayerPrefs.GetString("InputName", "Line 1 (Virtual Audio Cable)");
-        useSteamReverb = PlayerPrefs.GetInt("SteamReverb", 0) == 1;
+        //useSteamReverb = PlayerPrefs.GetInt("SteamReverb", 0) == 1;
         noReverb = PlayerPrefs.GetInt("NoReverb", 0) == 1;
         appExeName = PlayerPrefs.GetString("AppSourceName", "");
         AudioInputDropdown = GameObject.Find("AudioSourceDropdown").GetComponent<Dropdown>();
-        ShowHideInputDropdown(false);
+        if(inputName != "Line 1 (Virtual Audio Cable)"){
+            ShowHideInputDropdown(true);
+        }else{
+            ShowHideInputDropdown(false);
+        }
         AudioInputDropdown.ClearOptions();
         AppSelectionDropdown = GameObject.Find("AppSelectionDropdown").GetComponent<Dropdown>();
-        MSSettingsBtn = GameObject.Find("OpenMSAppAudioSettingsBtn").GetComponent<Button>();
-        GameObject.Find("OpenMSAppAudioSettingsBtn").SetActive(false);
         VACDownloadBtnGameObject = GameObject.Find("OpenVACDownloadBtn");
         VACDownloadBtn = VACDownloadBtnGameObject.GetComponent<Button>();
         VACDownloadBtnGameObject.SetActive(false);
@@ -145,23 +206,33 @@ public class SpeakersStart : MonoBehaviour
         });
         GameObject playerObject = GameObject.Find("Player Listener");
         playerListener = playerObject.GetComponent<SpatialPlayerListener>();
+        
         if (!playerListener.isIgniteBotEmbedded)
         {
             StartCoroutine(GetLatestVer());
+            isGoalHornEnabled = false;
+            GameObject.Find("GoalHornToggle").SetActive(false);
+            if (goalHornClip != null)
+            {
+                goalHornClip = null;
+            }
         }
         playerAudioListener = playerObject.GetComponent<AudioListener>();
         steamAudioListener = playerAudioListener.GetComponent<SteamAudioListener>();
         playerListernerLowPass = playerAudioListener.GetComponent<AudioLowPassFilter>();
-        masterSpeaker = GameObject.Find("Speaker 1").GetComponent<AudioSource>();
-        
-        speakerDelays.Add(masterSpeaker.name, UnityEngine.Random.Range(0.92f,1.08f));
-        speakerEchos.Add(masterSpeaker.name, masterSpeaker.GetComponent<AudioEchoFilter>());
-        for (int i = 2; i <= speakerCount; i++)
+        masterSpeaker = GameObject.Find("MasterSpeaker").GetComponent<AudioSource>();
+        // float mRandom = UnityEngine.Random.Range(0.92f,1.08f);
+        // masterSpeaker.volume *= mRandom;
+        // speakerDelays.Add(masterSpeaker.name, mRandom);
+        // speakerEchos.Add(masterSpeaker.name, masterSpeaker.GetComponent<AudioEchoFilter>());
+        for (int i = 1; i <= speakerCount; i++)
         {
             AudioSource speaker = GameObject.Find("Speaker " + i).GetComponent<AudioSource>();
+            speaker.mute = true;
             speakers.Add(speaker);
-            float random = UnityEngine.Random.Range(0.92f,1.08f);
-            speakerDelays.Add(speaker.name, UnityEngine.Random.Range(0.92f,1.08f));
+            float random = UnityEngine.Random.Range(0.92f, 1.08f);
+            speaker.volume *= UnityEngine.Random.Range(0.89f, 0.999f);
+            speakerDelays.Add(speaker.name, UnityEngine.Random.Range(0.92f, 1.08f));
             speakerEchos.Add(speaker.name, speaker.GetComponent<AudioEchoFilter>());
         }
         for (int i = 1; i <= speakerCount; i++)
@@ -172,13 +243,14 @@ public class SpeakersStart : MonoBehaviour
         foreach (var steamSourcePair in steamAudioSpeakers)
         {
             steamSourcePair.Value.reflections = useSteamReverb;
-            float rand = UnityEngine.Random.Range(0.85f,1.15f);
+            float rand = UnityEngine.Random.Range(0.85f, 1.15f);
             steamSourcePair.Value.dipolePower *= rand;
             rand = ((rand - 1.0f) * -1f) + 1.0f;
             GameObject.Find(steamSourcePair.Key).GetComponent<AudioDistortionFilter>().distortionLevel *= rand;
-            steamSourcePair.Value.dipoleWeight *= UnityEngine.Random.Range(0.85f,1.15f);            
+            steamSourcePair.Value.dipoleWeight *= UnityEngine.Random.Range(0.85f, 1.15f);
         }
-        foreach(AudioReverbFilter reverb in speakerReverbs.Values){
+        foreach (AudioReverbFilter reverb in speakerReverbs.Values)
+        {
             reverb.enabled = !noReverb;
         }
         bool defaultFound = false;
@@ -200,41 +272,6 @@ public class SpeakersStart : MonoBehaviour
                 VACFound = true;
             }
             UnityEngine.Debug.Log("Name: " + device);
-        }
-        string[] args = System.Environment.GetCommandLineArgs();
-        for (int i = 0; i < args.Length; i++)
-        {
-            if (args[i].Contains("selectinput"))
-            {
-                ShowHideInputDropdown(true);
-                GameObject.Find("OpenMSAppAudioSettingsBtn").SetActive(true);
-                break;
-            }
-            if (args[i].Contains("reset"))
-            {
-                PlayerPrefs.DeleteAll();
-                break;
-            }
-            if(args[i].Contains("steamreverb")){
-                PlayerPrefs.SetInt("SteamReverb", 1);
-                PlayerPrefs.Save();
-                useSteamReverb = true;
-            }
-            if(args[i].Contains("nosteamreverb")){
-                PlayerPrefs.SetInt("SteamReverb", 0);
-                PlayerPrefs.Save();
-                useSteamReverb = false;
-            }
-            if(args[i].Contains("noreverb")){
-                PlayerPrefs.SetInt("NoReverb", 1);
-                PlayerPrefs.Save();
-                noReverb = true;
-            }
-            if(args[i].Contains("reverb")){
-                PlayerPrefs.SetInt("NoReverb", 0);
-                PlayerPrefs.Save();
-                noReverb = false;
-            }
         }
         AudioInputDropdown.onValueChanged.AddListener(delegate
         {
@@ -259,13 +296,97 @@ public class SpeakersStart : MonoBehaviour
         sourceInit();
     }
 
-    void ShowHideInputDropdown(bool shouldShow){
-        if(!shouldShow){
+    // void ReloadSettings(){
+    //     inputName = PlayerPrefs.GetString("InputName", "Line 1 (Virtual Audio Cable)");
+    //     useSteamReverb = PlayerPrefs.GetInt("SteamReverb", 0) == 1;
+    //     noReverb = PlayerPrefs.GetInt("NoReverb", 0) == 1;
+    //     appExeName = PlayerPrefs.GetString("AppSourceName", "");
+    // }
+
+    void GoalHornToggleValueChanged(Toggle change)
+    {
+        //isGoalHornEnabled = goalHornToggle.isOn;
+        if(goalHornToggle.isOn){
+            StartCoroutine(TryLoadGoalHornWav(true));
+        }else{
+            isGoalHornEnabled = false;
+            goalHornClip = null;
+        }
+        // PlayerPrefs.SetInt("GoalHornEnabled", isGoalHornEnabled ? 1 : 0);
+        // PlayerPrefs.Save();
+    }
+    IEnumerator TryLoadGoalHornWav(bool enableIfValid)
+    {
+        string goalHornFilePath = "";
+        isGoalHornEnabled = false;
+        goalHornFilePath = Application.streamingAssetsPath + "\\..\\..\\GoalHorn.wav";
+        string url = string.Format("file://{0}", goalHornFilePath);
+        if (File.Exists(goalHornFilePath))
+        {
+            WWW www = new WWW(url);
+
+            yield return www;
+            try
+            {
+                goalHornClip = www.GetAudioClip(false, false);
+                if (goalHornClip != null && goalHornClip.length > 0f)
+                {
+                    isGoalHornFileValid = true;
+                    if(enableIfValid){
+                        isGoalHornEnabled = true;
+                        PlayerPrefs.SetInt("GoalHornEnabled", isGoalHornEnabled ? 1 : 0);
+                        PlayerPrefs.Save();
+                    }
+                    float clipLoudness = 0.0f;
+                    float[] sample = new float[(goalHornClip.samples) * goalHornClip.channels];
+                    goalHornClip.GetData(sample, 0);
+                    for (int i = 0; i < sample.Length; i++)
+                    {
+                        clipLoudness += Mathf.Abs(sample[i]);
+
+                    }
+                    UnityEngine.Debug.Log("GOALHORN: " + ((float)clipLoudness / (float)sample.Length).ToString());
+                    averageGoalHornLoudness = (float)clipLoudness / (float)sample.Length;
+                    UnityEngine.Debug.Log((float)clipLoudness / (float)sample.Length);
+
+                }
+            }
+            catch
+            {
+                isGoalHornFileValid = false;
+                goalHornToggle.enabled = false;
+                isGoalHornEnabled = enableIfValid ? false : isGoalHornEnabled;
+                goalHornToggle.isOn = false;
+                goalHornToggle.transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "GoalHornToggleBackground").GetComponent<Image>().color = new Color32(152, 147, 147, 255);
+                goalHornToggle.transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "GoalHornToggleLabel").GetComponent<Text>().color = new Color32(152, 147, 147, 255);
+                GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "goalHornTooltipText").GetComponent<Text>().text = "C:\\Program Files(x86)\\Echo Speaker System\\GoalHorn.wav was not found/is invalid!";
+            }
+        }
+        else
+        {
+            isGoalHornFileValid = false;
+            goalHornToggle.enabled = false;
+            isGoalHornEnabled = enableIfValid ? false : isGoalHornEnabled;
+            goalHornToggle.isOn = false;
+            var bg = goalHornToggle.transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "GoalHornToggleBackground").GetComponent<Image>();
+            bg.color = new Color32(152, 147, 147, 255);
+            goalHornToggle.transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "GoalHornToggleBackground").GetComponent<Image>().color = new Color32(152, 147, 147, 255);
+            goalHornToggle.transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "GoalHornToggleLabel").GetComponent<Text>().color = new Color32(152, 147, 147, 255);
+            GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "goalHornTooltipText").GetComponent<Text>().text = "C:\\Program Files(x86)\\Echo Speaker System\\GoalHorn.wav was not found/is invalid!";
+        }
+    }
+
+    void ShowHideInputDropdown(bool shouldShow)
+    {
+        if (!shouldShow)
+        {
             AudioInputDropdown.enabled = false;
             AudioInputDropdown.interactable = false;
             GameObject.Find("AudioSourceDropdownLabel").GetComponent<Text>().enabled = false;
             AudioInputDropdown.image.enabled = false;
-        }else{
+        }
+        else
+        {
             AudioInputDropdown.enabled = true;
             AudioInputDropdown.interactable = true;
             GameObject.Find("AudioSourceDropdownLabel").GetComponent<Text>().enabled = true;
@@ -278,26 +399,30 @@ public class SpeakersStart : MonoBehaviour
         isReady = false;
         playerListener.speakersReady = false;
         masterSpeaker.clip = null;
-        if(masterSpeaker.isPlaying){
+        if (masterSpeaker.isPlaying)
+        {
             masterSpeaker.Stop();
         }
         foreach (AudioSource aSource in speakers)
         {
             aSource.clip = null;
-            if(aSource.isPlaying){
+            if (aSource.isPlaying)
+            {
                 aSource.Stop();
             }
         }
-        mic = Microphone.Start(inputName, true, 300, FREQUENCY);
+        masterClip = Microphone.Start(inputName, true, 300, FREQUENCY);
         reverseLoopOrder = false;
         loops = 0;
-        var clip = AudioClip.Create("test", 300 * FREQUENCY, 1, FREQUENCY, false);
-        while (!(Microphone.GetPosition(inputName) > 0)) { } 
-        masterSpeaker.clip = clip;
+        //masterClip = AudioClip.Create("test", 300 * FREQUENCY, 1, FREQUENCY, false);
+        while (!(Microphone.GetPosition(inputName) > 0)) { }
+        masterSpeaker.clip = masterClip;
         masterSpeaker.loop = true;
+        masterSpeaker.dopplerLevel = 0f;
         foreach (AudioSource aSource in speakers)
         {
-            aSource.clip = clip;
+            aSource.dopplerLevel = 0.0f;
+            aSource.clip = masterClip;
             aSource.loop = true;
         }
         StartCoroutine(SyncSourcesInit());
@@ -357,80 +482,160 @@ public class SpeakersStart : MonoBehaviour
             if (!hasCleanedUp && (pos = Microphone.GetPosition(inputName)) > (FREQUENCY / 2))
             {
                 if (lastPos > pos) lastPos = 0;
-
                 if (pos - lastPos > 0)
-                {                    
+                {
                     // Allocate the space for the sample.
-                    float[] sample = new float[(pos - lastPos) * 1];
+                    if (!goalHornPlaying && loops % 100 == 1)
+                    {
+                        float[] sample = new float[(pos - lastPos) * 1];
 
-                    // Get the data from microphone.
-                    mic.GetData(sample, lastPos);
-                    float highest = 0.0f;
-                    for (int i = 0; i < sample.Length; i++)
-                    {
-                        if (sample[i] > highest)
+                        // Get the data from microphone.
+                        masterClip.GetData(sample, lastPos);
+                        float clipLoudness = 0f;
+                        float highest = 0.0f;
+                        int zeroCount = 0;
+                        for (int i = 0; i < sample.Length; i++)
                         {
-                            highest = sample[i];
+                            clipLoudness += Mathf.Abs(sample[i]);
+                            if (sample[i] == 0.0f)
+                            {
+                                zeroCount++;
+                            }
+                            // if (sample[i] > highest)
+                            // {
+                            //     highest = sample[i];
+                            // }
+                            // sample[i] = sample[i] * 1.95f;
+                            // if (sample[i] > 1.0f)
+                            // {
+                            //     UnityEngine.Debug.Log(sample[i]);
+                            //     sample[i] = 1.0f;
+                            // }
                         }
-                        sample[i] = sample[i] * 1.95f;
-                        if (sample[i] > 1.0f)
+                        if (((float)zeroCount / (float)sample.Length) > 0.65f )
                         {
-                            UnityEngine.Debug.Log(sample[i]);
-                            sample[i] = 1.0f;
+                            //UnityEngine.Debug.Log((float)zeroCount/(float)sample.Length);
+                            // for (int i = 0; i < sample.Length; i++)
+                            // {
+                            //     sample[i] = 0.0f;
+                            // }
+                            // masterClip.SetData(sample, lastPos);
+                            if(!clipZeroed){
+                                StartCoroutine(StartFade(0.5f, 0));
+                                clipZeroed = true;
+                            }else{
+                                StartCoroutine(StartFade(0.5f, 1));
+                                clipZeroed = false;
+                            }
+                        }
+                        else
+                        {
+                            if(clipZeroed){
+                                StartCoroutine(StartFade(0.5f, 1));
+                                clipZeroed = false;
+                            }
+                            //UnityEngine.Debug.Log(averageMusicLoudness);
+                            float avgSampleLoudness = ((float)clipLoudness / (float)sample.Length);
+                            if ((musicLoudnessAcc + avgSampleLoudness < float.MaxValue) && musicLoudnessCount + 1 < long.MaxValue)
+                            {
+                                musicLoudnessAcc += avgSampleLoudness;
+                                musicLoudnessCount++;
+                            }
+                            else
+                            {
+                                musicLoudnessAcc = averageMusicLoudness + avgSampleLoudness;
+                                musicLoudnessCount = 2;
+                            }
+                            averageMusicLoudness = musicLoudnessAcc / musicLoudnessCount;
                         }
                     }
+                    if (isReady)
+                    {
+                        if (playerListener.goalScored)
+                        {
+                            if(goalHornPlaying || !isGoalHornEnabled){
+                                playerListener.goalScored = false;
+                            }else{
+                                // previousTimeSamples = masterSpeaker.timeSamples;
+                                // speakerEchos[masterSpeaker.name].delay = 0f;
+                                // masterSpeaker.Stop();
+                                // masterSpeaker.volume *= 0.5f;
+                                // masterSpeaker.clip = goalHornClip;
+                                // masterSpeaker.loop = false;
+                                if(clipZeroed){
+                                    StartCoroutine(StartFade(0.25f, 1));
+                                    clipZeroed = false;
+                                }
+                                goalHornClipVolMult = averageMusicLoudness == 0.0f ? 0.3f : (averageMusicLoudness *1.1f / averageGoalHornLoudness);//+ 0.03225f;
+                                foreach (AudioSource aSource in speakers)
+                                {
+                                    // speakerEchos[aSource.name].delay = 0f;
+                                    // aSource.Stop();
+                                    aSource.volume *= goalHornClipVolMult;
+                                    aSource.dopplerLevel = 0.005f;
+                                    // aSource.clip = goalHornClip;
+                                    aSource.loop = false;
+                                }
+                                StartCoroutine(SyncSourcesGoalHorn());
+                                goalHornPlaying = true;
+                                playerListener.goalScored = false;
+                                StartCoroutine(SyncSourcesAfterGoal());
+                            }
+                        }
+                        if (!reverseLoopOrder)
+                        {
+                            foreach (AudioSource aSource in speakers)
+                            {
+                                //aSource.clip.SetData(sample, lastPos);
+                                //aSource.clip = masterClip;
+                                float dist = UnityEngine.Vector3.Distance(aSource.transform.position, playerListener.transform.position) * (speedOfSoundMultiplier * speakerDelays[aSource.name]);//1.19f; //1.142f;
+                                speakerEchos[aSource.name].delay = dist;
+                                // if(loops > 300){
+                                //     aSource.Pause();
+                                // }
+                                if (!aSource.isPlaying) { aSource.Play(); }
+                                reverseLoopOrder = true;
+                            }
+                            //masterSpeaker.clip.SetData(sample, lastPos);
+                            //masterSpeaker.clip = masterClip;
+                            // float Mastdist = UnityEngine.Vector3.Distance(masterSpeaker.transform.position, playerListener.transform.position) * (speedOfSoundMultiplier * speakerDelays[masterSpeaker.name]);// 1.19f; ;
+                            // speakerEchos[masterSpeaker.name].delay = Mastdist;
+                            if (!masterSpeaker.isPlaying) { masterSpeaker.Play(); }
+                        }
+                        else
+                        {
+                            foreach (AudioSource aSource in Enumerable.Reverse(speakers))
+                            {
+                                //aSource.clip.SetData(sample, lastPos);
+                                //aSource.clip = masterClip;
+                                float dist = UnityEngine.Vector3.Distance(aSource.transform.position, playerListener.transform.position) * (speedOfSoundMultiplier * speakerDelays[aSource.name]);// 1.19f;
+                                speakerEchos[aSource.name].delay = dist;
+                                aSource.dopplerLevel = 0.005f;
+                                // if(loops > 300){
+                                //     aSource.Pause();
+                                // }
+                                if (!aSource.isPlaying) { aSource.Play(); }
+                                //aSource.timeSamples = masterSpeaker.timeSamples;
+                                reverseLoopOrder = false;
+                            }
+                            //masterSpeaker.clip.SetData(sample, lastPos);
+                            //masterSpeaker.clip = masterClip;
+                            // float Mastdist = UnityEngine.Vector3.Distance(masterSpeaker.transform.position, playerListener.transform.position) * (speedOfSoundMultiplier * speakerDelays[masterSpeaker.name]);//  1.19f;
+                            // speakerEchos[masterSpeaker.name].delay = Mastdist;
+                            if (!masterSpeaker.isPlaying) { masterSpeaker.Play(); }
+                        }
 
-                    if (!reverseLoopOrder)
-                    {
-                        foreach (AudioSource aSource in speakers)
-                        {
-                            aSource.clip.SetData(sample, lastPos);
-                            float dist = UnityEngine.Vector3.Distance(aSource.transform.position, playerListener.transform.position) * (speedOfSoundMultiplier * speakerDelays[aSource.name]);//1.19f; //1.142f;
-                            speakerEchos[aSource.name].delay = dist;
-                            // if(loops > 300){
-                            //     aSource.Pause();
-                            // }
-                            if (!aSource.isPlaying) { aSource.Play(); }
-                            reverseLoopOrder = true;
-                        }
-                        masterSpeaker.clip.SetData(sample, lastPos);
-                        float Mastdist = UnityEngine.Vector3.Distance(masterSpeaker.transform.position, playerListener.transform.position) * (speedOfSoundMultiplier * speakerDelays[masterSpeaker.name]);// 1.19f; ;
-                        speakerEchos[masterSpeaker.name].delay = Mastdist;
-                        if (!masterSpeaker.isPlaying) { masterSpeaker.Play(); }
-                    }
-                    else
-                    {
-                        foreach (AudioSource aSource in Enumerable.Reverse(speakers))
-                        {
-                            aSource.clip.SetData(sample, lastPos);
-                            float dist = UnityEngine.Vector3.Distance(aSource.transform.position, playerListener.transform.position) * (speedOfSoundMultiplier * speakerDelays[aSource.name]);// 1.19f;
-                            speakerEchos[aSource.name].delay = dist;
-                            // if(loops > 300){
-                            //     aSource.Pause();
-                            // }
-                            if (!aSource.isPlaying) { aSource.Play(); }
-                            //aSource.timeSamples = masterSpeaker.timeSamples;
-                            reverseLoopOrder = false;
-                        }
-                        masterSpeaker.clip.SetData(sample, lastPos);
-                        float Mastdist = UnityEngine.Vector3.Distance(masterSpeaker.transform.position, playerListener.transform.position) * (speedOfSoundMultiplier * speakerDelays[masterSpeaker.name]);//  1.19f;
-                        speakerEchos[masterSpeaker.name].delay = Mastdist;
-                        if (!masterSpeaker.isPlaying) { masterSpeaker.Play(); }
-                    }
-                    if(isReady){
-                        foreach(AudioReverbFilter reverb in speakerReverbs.Values){
-            reverb.enabled = !noReverb;
-        }
                         float playerXAbs = Math.Abs(playerListener.head.position.x);
                         if (playerXAbs > 40f)
                         {
                             float vol = Map(playerXAbs, 40.0001f, 90f, 0.01f, 0.79f);
-                            AudioListener.volume = 0.49f + (Mathf.Log10(vol) / -4.0f);//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
-                                                                                    //Debug.Log(AudioListener.volume);
-                            if(useSteamReverb){
+                            AudioListener.volume = listenerVolume * (0.49f + (Mathf.Log10(vol) / -4.0f));//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
+                            //UnityEngine.Debug.Log(listenerVolume);                                                          //Debug.Log(AudioListener.volume);
+                            if (useSteamReverb)
+                            {
                                 foreach (SteamAudioSource steamSource in steamAudioSpeakers.Values)
                                 {
-                                    steamSource.indirectMixLevel = playerListener.isReverbMixChangeOn? AudioListener.volume * 1.0f : 1.0f;
+                                    steamSource.indirectMixLevel = playerListener.isReverbMixChangeOn ? AudioListener.volume * 1.0f : 1.0f;
                                 }
                             }
                             vol = Map(playerXAbs, 40.0001f, 76f, 0.0001f, 1.0f);
@@ -442,22 +647,28 @@ public class SpeakersStart : MonoBehaviour
                             //float vol2 = Map(40.001f, 40.0001f, 90f, 0.004f, 1.0f);
                             //AudioListener.volume = Mathf.Log10(vol) / -4.0f;//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
                             //Debug.Log(Mathf.Log10(vol2) / -4.0f);
-                            if(AudioListener.volume != 1.0f){
-                                if(useSteamReverb){
-                                    foreach (SteamAudioSource steamSource in steamAudioSpeakers.Values)
-                                    {
-                                        steamSource.indirectMixLevel = 1.0f;
-                                    }
-                                }
-                            }
-                            AudioListener.volume = 1.0f;
+                            // if (AudioListener.volume != 1.0f)
+                            // {
+                            //     if (useSteamReverb)
+                            //     {
+                            //         foreach (SteamAudioSource steamSource in steamAudioSpeakers.Values)
+                            //         {
+                            //             steamSource.indirectMixLevel = 1.0f;
+                            //         }
+                            //     }
+                            // }
+                            //UnityEngine.Debug.Log(listenerVolume);
+                            AudioListener.volume = listenerVolume;
                             playerListernerLowPass.cutoffFrequency = 22000f;
                         }
                         if (playerListener.head.position.x != -105.5 && (playerXAbs > 72))
                         {
                             if (!respawnResetDone)
                             {
-                                StartCoroutine(SyncSources());
+                                if (!goalHornPlaying)
+                                {
+                                    StartCoroutine(SyncSources());
+                                }
                                 respawnResetDone = true;
                             }
                         }
@@ -589,8 +800,8 @@ public class SpeakersStart : MonoBehaviour
         {
             updateFileName = "EchoSpeakerSystemInstall_" + latestReleaseVer + ".exe";
             WebClient webClient = new WebClient();
-			webClient.DownloadFileCompleted += Completed;
-			webClient.DownloadFileAsync(new Uri(latestReleaseURL), Path.GetTempPath() + updateFileName);
+            webClient.DownloadFileCompleted += Completed;
+            webClient.DownloadFileAsync(new Uri(latestReleaseURL), Path.GetTempPath() + updateFileName);
         }
         catch
         {
@@ -599,16 +810,16 @@ public class SpeakersStart : MonoBehaviour
         UpdateDownloadBtnGameObject.SetActive(false);
     }
     private void Completed(object sender, AsyncCompletedEventArgs e)
-		{
+    {
 
-			Process.Start(new ProcessStartInfo
-			{
-				FileName = Path.Combine(Path.GetTempPath(), updateFileName),
-				UseShellExecute = true
-			});
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = Path.Combine(Path.GetTempPath(), updateFileName),
+            UseShellExecute = true
+        });
 
-			Application.Quit();
-		}
+        Application.Quit();
+    }
     void OpenVACDownload()
     {
         Application.OpenURL("https://software.muzychenko.net/freeware/vac464lite.zip");
@@ -616,15 +827,109 @@ public class SpeakersStart : MonoBehaviour
     }
     private IEnumerator SyncSourcesInit()
     {
+        //speakerEchos[masterSpeaker.name].delay = 0f;
         yield return new WaitForSeconds(2);
+        masterSpeaker.clip = null;
+        masterSpeaker.clip = masterClip;
         foreach (AudioSource aSource in speakers)
         {
+            //speakerEchos[aSource.name].delay = 0f;
+            aSource.clip = null;
+            aSource.clip = masterClip;
             aSource.timeSamples = masterSpeaker.timeSamples;
-            yield return null;
+            aSource.mute = false;
+        }
+        yield return null;
+        foreach (AudioReverbFilter reverb in speakerReverbs.Values)
+        {
+            if (!noReverb)
+            {
+                reverb.reverbPreset = AudioReverbPreset.Arena;
+            }
+            else
+            {
+                reverb.reverbPreset = AudioReverbPreset.Off;
+            }
         }
         loops = 0;
         isReady = true;
         playerListener.speakersReady = true;
+        yield return new WaitForSeconds(0.5f);
+        StartCoroutine(StartFade(3, 1));
+    }
+
+    private IEnumerator SyncSourcesAfterGoal()
+    {
+        //speakerEchos[masterSpeaker.name].delay = 0f;
+        float waitTime = 23;
+        if (goalHornClip.length < waitTime)
+        {
+            waitTime = goalHornClip.length - 2.55f;
+        }
+        yield return new WaitForSeconds(waitTime);
+        StartCoroutine(StartFade(2.5f, 0.001f));
+        yield return new WaitForSeconds(2.48f);
+        // float currentTime = 0;
+        // float currentVol = listenerVolume;
+        // float targetValue = Mathf.Clamp(0.3f, 0.0001f, 1);
+
+        // while (currentTime < 3f)
+        // {
+        //     currentTime += Time.deltaTime;
+        //     float newVol = Mathf.Lerp(currentVol, targetValue, currentTime / 3f);
+        //     listenerVolume = newVol;
+        //     UnityEngine.Debug.Log(listenerVolume);
+        //     yield return null;
+        // }
+        // yield break;
+        // masterSpeaker.volume *= 2f;
+        // masterSpeaker.timeSamples = lastPos;
+        // masterSpeaker.clip = masterClip;
+        // masterSpeaker.loop = true;
+        AudioReverbPreset preset = noReverb ? AudioReverbPreset.Off : AudioReverbPreset.Arena;
+        foreach (AudioSource aSource in speakers)
+        {
+            speakerReverbs[aSource.name].reverbPreset = preset;
+            speakerEchos[aSource.name].delay = 0f;
+            aSource.dopplerLevel = 0.0f;
+            //aSource.clip = null;
+            aSource.loop = true;
+            aSource.clip = masterClip;
+            aSource.timeSamples = masterSpeaker.timeSamples;
+            aSource.volume *= 1f / goalHornClipVolMult;
+        }
+        yield return null;
+        // foreach (AudioReverbFilter reverb in speakerReverbs.Values)
+        // {
+        //     if (!noReverb)
+        //     {
+        //         reverb.reverbPreset = AudioReverbPreset.Arena;
+        //     }
+        //     else
+        //     {
+        //         reverb.reverbPreset = AudioReverbPreset.Off;
+        //     }
+        // }
+        // foreach (AudioReverbFilter reverb in speakerReverbs.Values)
+        // {
+        //     if(!noReverb){
+        //         reverb.reverbPreset = AudioReverbPreset.Arena;
+        //     }
+        // }
+        goalHornPlaying = false;
+        loops = 0;
+        isReady = true;
+        goalHornToggle.enabled = true;
+        playerListener.speakersReady = true;
+        // foreach (AudioSource aSource in speakers)
+        // {
+        //     // aSource.clip = masterClip;
+        //     aSource.loop = true;
+        //     //aSource.timeSamples = masterSpeaker.timeSamples;
+        //     aSource.volume *= 3f;
+        // }
+        StartCoroutine(StartFade(2.5f, 1));
+        // StartCoroutine(SyncSources());
     }
     private IEnumerator ResetAudio()
     {
@@ -644,22 +949,83 @@ public class SpeakersStart : MonoBehaviour
         //          yield return null;
         //      }
         //      loops = 0;
-        //  }    
+        //  }
     }
     private IEnumerator SyncSources()
     {
         //  while (true)
         //  {
+        //previousTimeSamples = masterSpeaker.timeSamples;
+        //masterSpeaker.clip = null;
+        // speakerEchos[masterSpeaker.name].delay = 0f;
+        //masterSpeaker.clip = masterClip;
+        //masterSpeaker.timeSamples = previousTimeSamples;
         foreach (AudioSource aSource in speakers)
         {
-            aSource.clip = masterSpeaker.clip;
+            speakerEchos[aSource.name].delay = 0f;
+            aSource.dopplerLevel = 0.0f;
+            //aSource.clip = null;
+            aSource.clip = masterClip;
             aSource.timeSamples = masterSpeaker.timeSamples;
-            yield return null;
         }
         loops = 0;
         isReady = true;
         playerListener.speakersReady = true;
-        //  }    
+        yield return null;
+        //  }
+    }
+
+    private IEnumerator SyncSourcesGoalHorn()
+    {
+        goalHornToggle.enabled = false;
+
+        //  while (true)
+        //  {
+        //masterSpeaker.clip = null;
+        // speakerEchos[masterSpeaker.name].delay = 0f;
+        // masterSpeaker.clip = goalHornClip;
+        // masterSpeaker.timeSamples = 0;
+        // foreach (AudioReverbFilter reverb in speakerReverbs.Values)
+        // {
+        //     reverb.reverbPreset = AudioReverbPreset.Generic;
+        // }
+        foreach (AudioSource aSource in speakers)
+        {
+            speakerReverbs[aSource.name].reverbPreset = AudioReverbPreset.Generic;
+            speakerEchos[aSource.name].delay = 0f;
+            // aSource.Stop();
+            aSource.dopplerLevel = 0f;
+            aSource.clip = goalHornClip;
+            aSource.timeSamples = 13000;
+
+        }
+        // foreach (AudioSource aSource in speakers)
+        // {
+        //     aSource.Play();                        
+        // }
+
+        loops = 0;
+        isReady = true;
+        playerListener.speakersReady = true;
+        yield return null;
+        //  }
+    }
+
+    public IEnumerator StartFade(float duration, float targetVolume)
+    {
+        float currentTime = 0;
+        float currentVol = listenerVolume;
+        float targetValue = Mathf.Clamp(targetVolume, 0.0001f, 1);
+
+        while (currentTime < duration)
+        {
+            currentTime += Time.deltaTime;
+            float newVol = Mathf.Lerp(currentVol, targetValue, currentTime / duration);
+            listenerVolume = newVol;
+            //UnityEngine.Debug.Log(listenerVolume);
+            yield return null;
+        }
+        yield break;
     }
 
     private IEnumerator setAppToVAC(int procID, string input, bool retainOriginalEndpoint = true)
@@ -790,8 +1156,8 @@ public class SpeakersStart : MonoBehaviour
         using (UnityWebRequest webRequest = UnityWebRequest.Get("https://api.github.com/repos/iblowatsports/Echo-VR-Speaker-System/releases/latest"))
         {
             // Request and wait for the desired page. 73
-            
-                yield return webRequest.SendWebRequest();
+
+            yield return webRequest.SendWebRequest();
             try
             {
                 if (webRequest.isNetworkError)
@@ -801,6 +1167,7 @@ public class SpeakersStart : MonoBehaviour
                 {
                     string resp = webRequest.downloadHandler.text;
                     VersionJson latestVersion = JsonUtility.FromJson<VersionJson>(resp);
+                    
                     if (latestVersion.tag_name != VERSION_TAGNAME)
                     {
                         latestReleaseVer = latestVersion.tag_name;
@@ -820,11 +1187,91 @@ public class SpeakersStart : MonoBehaviour
         }
     }
 
+    IEnumerator GetWhatsNew()
+    {
+        using (UnityWebRequest webRequest = UnityWebRequest.Get("https://api.github.com/repos/iblowatsports/Echo-VR-Speaker-System/releases"))
+        {
+            // Request and wait for the desired page. 73
+
+            yield return webRequest.SendWebRequest();
+            try
+            {
+                if (webRequest.isNetworkError)
+                {
+                }
+                else
+                {
+                    string resp = webRequest.downloadHandler.text;
+                    VersionJson[] releases = JsonHelper.FromJson<VersionJson>(resp);
+                    
+                    VersionJson thisRelease = releases.FirstOrDefault(r => r.tag_name == VERSION_TAGNAME);
+                    if(thisRelease != null){
+                        GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "WhatsNewText").GetComponent<Text>().text = thisRelease.body.Replace("**","").Replace(" _"," ").Replace("_ ", " ");
+                        GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "WhatsNewTitle").GetComponent<Text>().text = "What's New (" + VERSION_TAGNAME + ")";
+                    if(isNewUpdate){
+                        PlayerPrefs.SetString("RunningVersion", VERSION_TAGNAME);
+                        PlayerPrefs.Save();
+                        GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "WhatsNewPopup").gameObject.SetActive(true);
+                    }
+                    else{
+                        GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "WhatsNewPopup").gameObject.SetActive(false);
+                    }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "WhatsNewTitle").GetComponent<Text>().text = "What's New (" + VERSION_TAGNAME + ")";
+                GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "WhatsNewPopup").gameObject.SetActive(false);
+            }
+        }
+    }
+
     float Map(float s, float a1, float a2, float b1, float b2)
     {
         return b1 + (s - a1) * (b2 - b1) / (a2 - a1);
     }
 }
+
+public static class JsonHelper
+    {
+        public static T[] FromJson<T>(string jsonArray)
+        {
+            jsonArray = WrapArray (jsonArray);
+            return FromJsonWrapped<T> (jsonArray);
+        }
+ 
+        public static T[] FromJsonWrapped<T> (string jsonObject)
+        {
+            Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(jsonObject);
+            return wrapper.items;
+        }
+ 
+        private static string WrapArray (string jsonArray)
+        {
+            return "{ \"items\": " + jsonArray + "}";
+        }
+ 
+        public static string ToJson<T>(T[] array)
+        {
+            Wrapper<T> wrapper = new Wrapper<T>();
+            wrapper.items = array;
+            return JsonUtility.ToJson(wrapper);
+        }
+ 
+        public static string ToJson<T>(T[] array, bool prettyPrint)
+        {
+            Wrapper<T> wrapper = new Wrapper<T>();
+            wrapper.items = array;
+            return JsonUtility.ToJson(wrapper, prettyPrint);
+        }
+ 
+        [Serializable]
+        private class Wrapper<T>
+        {
+            public T[] items;
+        }
+    }
 [System.Serializable]
 public class VersionJson
 {
@@ -832,6 +1279,7 @@ public class VersionJson
     public Author author;
     public string html_url;
     public Asset[] assets;
+    public string body;
 }
 [System.Serializable]
 public class Asset

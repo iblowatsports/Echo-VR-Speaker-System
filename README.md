@@ -11,9 +11,8 @@ This is a system to take any audio stream (usually music) and make it sound like
   
  ## Setup
  
- * Go to **[releases](https://github.com/iblowatsports/Echo-VR-Speaker-System/releases/latest)** and download the **InstallEchoSpeakerSystem.bat file. Run this file as administrator to install Echo Speaker System** and follow any UI prompts for Virtual Audio Cable installation if required (restart if needed as well)
+ * Go to **[releases](https://github.com/iblowatsports/Echo-VR-Speaker-System/releases/latest)** and download the **Installer exe. Run this as administrator to install Echo Speaker System** and follow any UI prompts for Virtual Audio Cable installation if required (restart if needed as well)
  * In the in-game settings for Echo VR, make sure that "Enable API Access" is set to "Enabled"
- * Run Echo Speaker System.exe from the folder you unzipped it to, when it launches: 
-   * Unless you have a specific use case, set/leave the Audio Input selection on "Line 1(Virtual Audio Cable). This is used as the audio input device for the speakers
+ * Run Echo Speaker System
    * Select the application you would like played via the "speakers" (you may have to hit the refresh app list button if it does not show up). This will switch the selected app to be played via another input device. 
 * Any sound played from the selected application will now go through the virtual speakers surrounding the arena. Once you close the Echo Speaker System exe, the application you had selected will be switched back to the audio device it originally was using. Any time the Echo Speaker System exe is run in the future, it will attempt to automatically find and use the Application you had previously used with the Speaker System

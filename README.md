@@ -10,6 +10,7 @@ This is a system to take any audio stream (usually music) and make it sound like
  
  ### Ignite Bot
  * Go to https://ignitevr.gg/ignitebot download, and install the latest Ignite Bot
+ * In the in-game settings for Echo VR, make sure that "Enable API Access" is set to "Enabled"
  * Run Ignite Bot and click on the "Speaker System" tab. Click "Install Echo Speaker System" and follow the installation prompts
  * To use Echo Speaker System, run Ignite Bot and click "Start Speaker System" from within the "Speaker System" tab
  

@@ -4,10 +4,6 @@ This is a system to take any audio stream (usually music) and make it sound like
 
 ![Speaker System App](https://github.com/iblowatsports/Echo-VR-Speaker-System/blob/main/EchoSpeakerSystem.png?raw=true)
 
-
-## This project requires Virtual Audio Cable
-  * The Echo Speaker System installer will automatically download and open the installer of Virtual Audio Cable if you do not have it installed
-  * After installing VAC, make sure to restart your PC and to reset your default audio input and output devices in the Windows settings (Windows will automatically set Virtual Audio Cable as the default input and output device at install time, which you don't want)
   
  ## Setup
  

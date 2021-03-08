@@ -35,7 +35,7 @@ public class SpatialPlayerListener : MonoBehaviour
     public bool hasCleanedUp = false;
     public bool speakersReady = false;
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         SetDefaultListenerPosition();
         string[] args = System.Environment.GetCommandLineArgs();
@@ -66,6 +66,32 @@ public class SpatialPlayerListener : MonoBehaviour
             poller.Add(subSocket);
             poller.RunAsync();
         }
+    }
+    IEnumerator LerpFunction(Quaternion endValue, float duration)
+    {
+        float time = 0;
+        Quaternion startValue = playerObject.transform.rotation;
+
+        while (time < duration)
+        {
+            playerObject.transform.rotation = Quaternion.Lerp(startValue, endValue, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        playerObject.transform.rotation = endValue;
+    }
+    IEnumerator LerpPosition(Vector3 targetPosition, float duration)
+    {
+        float time = 0;
+        Vector3 startPosition = playerObject.transform.position;
+
+        while (time < duration)
+        {
+            playerObject.transform.position = Vector3.Lerp(startPosition, targetPosition, time / duration);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        playerObject.transform.position = targetPosition;
     }
     public void Cleanup()
     {
@@ -194,11 +220,14 @@ public class SpatialPlayerListener : MonoBehaviour
                 {
                     StartCoroutine(GetRequest());
                 }
-
-                playerObject.transform.position = new Vector3(_playerHeadPosition[2], _playerHeadPosition[1], _playerHeadPosition[0]);
+    
+                StartCoroutine(LerpPosition(new Vector3(_playerHeadPosition[2], _playerHeadPosition[1], _playerHeadPosition[0]), 0.05f));
+                //playerObject.transform.position = new Vector3(_playerHeadPosition[2], _playerHeadPosition[1], _playerHeadPosition[0]);
                 headUp = new Vector3(_playerHeadUp[2], _playerHeadUp[1], _playerHeadUp[0]);
                 headForward = new Vector3(_playerHeadForward[2], _playerHeadForward[1], _playerHeadForward[0]);
-                playerObject.transform.LookAt(headForward + transform.position, headUp);
+                //playerObject.transform.LookAt(headForward + transform.position, headUp);
+                StartCoroutine(LerpFunction(Quaternion.LookRotation(headForward, headUp), 0.05f));
+                //playerObject.transform.rotation = Quaternion.Lerp(playerObject.transform.rotation, Quaternion.LookRotation(headForward + transform.position, headUp), 0.03f);
             }
         }
     }

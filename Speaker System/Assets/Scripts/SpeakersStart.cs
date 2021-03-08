@@ -24,7 +24,7 @@ using System.ComponentModel;
 
 public class SpeakersStart : MonoBehaviour
 {
-    public string VERSION_TAGNAME = "v0.4.0";
+    public string VERSION_TAGNAME = "v0.4.1";
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern System.IntPtr GetActiveWindow();
@@ -87,23 +87,26 @@ public class SpeakersStart : MonoBehaviour
     public float speedOfSoundMultiplier = 1.39f;
     public float reverbLevel = 1.0f;
     int previousTimeSamples = 0;
-    public bool noReverb = false;
     string latestReleaseURL = "";
     string latestReleaseVer = "";
+    AudioReverbPreset globalReverbPreset, spawnRoomReverbPreset;
     int speakerCount = 18;
     bool reverseLoopOrder;
     float listenerVolume, goalHornClipVolMult = 0.0f;
+    float goalHornVolumeUserMult = 1.1f;
+    Slider goalHornVolMultSlider, goalHornTimeSlider;
     SpatialPlayerListener playerListener;
     SteamAudioListener steamAudioListener;
-    public bool useSteamReverb = false;
     AudioListener playerAudioListener;
     AudioLowPassFilter playerListernerLowPass;
-    Dropdown.OptionData AudioInputData, AppSelectionData;
+    Dropdown.OptionData AudioInputData, AppSelectionData, ReverbPresetData;
     AudioEndpoints audioEndpointsJson = null;
     List<Dropdown.OptionData> AudioInputMessages = new List<Dropdown.OptionData>();
+    List<Dropdown.OptionData> ReverbPresetMessages = new List<Dropdown.OptionData>();
     List<Dropdown.OptionData> AppSelectionMessages = new List<Dropdown.OptionData>();
-    Dropdown AudioInputDropdown, AppSelectionDropdown;
-    int AudioInputIndex, AppSelectionIndex;
+    Dropdown AudioInputDropdown, AppSelectionDropdown, ReverbPresetDropdown, SpawnRoomReverbPresetDropdown;
+    DropdownMouseOver AppSelectionDropdownMouseOver;
+    int AudioInputIndex, AppSelectionIndex, ReverbPresetIndex;
     GameObject VACDownloadBtnGameObject, UpdateDownloadBtnGameObject;
     Button MSSettingsBtn, VACDownloadBtn, UpdateDownloadBtn, RefreshAppListBtn;
     string VACInputName = "(Virtual Audio Cable)";
@@ -116,51 +119,39 @@ public class SpeakersStart : MonoBehaviour
     bool respawnResetDone;
     bool isReady,clipZeroed,isNewUpdate = false;
     public static string updateFileName = "";
+    float goalHornMaxDuration = 23f;
+    bool inSpawnRoom = false;
 
     // Use this for initialization
     void Start()
     {
-        MSSettingsBtn = GameObject.Find("OpenMSAppAudioSettingsBtn").GetComponent<Button>();
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = 60;
+        var config = AudioSettings.GetConfiguration();
+        AudioSettings.Reset(config);
+        MSSettingsBtn = GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "OpenMSAppAudioSettingsBtn").GetComponent<Button>();
+        goalHornVolMultSlider = GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "GoalHornVolMultSlider").GetComponent<Slider>();
+        goalHornTimeSlider = GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "GoalHornTimeSlider").GetComponent<Slider>();
         isNewUpdate = PlayerPrefs.GetString("RunningVersion", "") != VERSION_TAGNAME;
+        globalReverbPreset = (AudioReverbPreset)PlayerPrefs.GetInt("GlobalReverbPreset", (int)AudioReverbPreset.Arena);
+        spawnRoomReverbPreset = (AudioReverbPreset)PlayerPrefs.GetInt("SpawnRoomReverbPreset", (int)AudioReverbPreset.Arena);
+        goalHornVolumeUserMult = PlayerPrefs.GetFloat("GoalHornVolumeUserMult", 1.1f);
+        goalHornMaxDuration = PlayerPrefs.GetFloat("GoalHornMaxDuration", 23f);
+        goalHornTimeSlider.value = goalHornMaxDuration;
+        goalHornVolMultSlider.value = (goalHornVolumeUserMult - 0.5f)/0.05f;
         StartCoroutine(GetWhatsNew());
-        GameObject.Find("OpenMSAppAudioSettingsBtn").SetActive(false);
         string[] args = System.Environment.GetCommandLineArgs();
         for (int i = 0; i < args.Length; i++)
         {
             if (args[i].Contains("selectinput"))
             {
                 ShowHideInputDropdown(true);
-                GameObject.Find("OpenMSAppAudioSettingsBtn").SetActive(true);
                 break;
             }
             if (args[i].Contains("reset"))
             {
                 PlayerPrefs.DeleteAll();
                 break;
-            }
-            // if (args[i].Contains("steamreverb"))
-            // {
-            //     PlayerPrefs.SetInt("SteamReverb", 1);
-            //     PlayerPrefs.Save();
-            //     useSteamReverb = true;
-            // }
-            // if (args[i].Contains("nosteamreverb"))
-            // {
-            //     PlayerPrefs.SetInt("SteamReverb", 0);
-            //     PlayerPrefs.Save();
-            //     useSteamReverb = false;
-            // }
-            if (args[i].Contains("noreverb"))
-            {
-                PlayerPrefs.SetInt("NoReverb", 1);
-                PlayerPrefs.Save();
-                noReverb = true;
-            }
-            if (args[i].Contains("reverb"))
-            {
-                PlayerPrefs.SetInt("NoReverb", 0);
-                PlayerPrefs.Save();
-                noReverb = false;
             }
         }
         goalHornToggle = GameObject.Find("GoalHornToggle").GetComponent<Toggle>();
@@ -171,12 +162,8 @@ public class SpeakersStart : MonoBehaviour
             GoalHornToggleValueChanged(goalHornToggle);
         });
         StartCoroutine(TryLoadGoalHornWav(isGoalHornEnabled));
-        Application.targetFrameRate = 30;
-        QualitySettings.vSyncCount = 0;
         
         inputName = PlayerPrefs.GetString("InputName", "Line 1 (Virtual Audio Cable)");
-        //useSteamReverb = PlayerPrefs.GetInt("SteamReverb", 0) == 1;
-        noReverb = PlayerPrefs.GetInt("NoReverb", 0) == 1;
         appExeName = PlayerPrefs.GetString("AppSourceName", "");
         AudioInputDropdown = GameObject.Find("AudioSourceDropdown").GetComponent<Dropdown>();
         if(inputName != "Line 1 (Virtual Audio Cable)"){
@@ -186,6 +173,8 @@ public class SpeakersStart : MonoBehaviour
         }
         AudioInputDropdown.ClearOptions();
         AppSelectionDropdown = GameObject.Find("AppSelectionDropdown").GetComponent<Dropdown>();
+        ReverbPresetDropdown = GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "ReverbPresetDropdown").GetComponent<Dropdown>();
+        SpawnRoomReverbPresetDropdown = GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "SpawnRoomReverbPresetDropdown").GetComponent<Dropdown>();
         VACDownloadBtnGameObject = GameObject.Find("OpenVACDownloadBtn");
         VACDownloadBtn = VACDownloadBtnGameObject.GetComponent<Button>();
         VACDownloadBtnGameObject.SetActive(false);
@@ -204,6 +193,7 @@ public class SpeakersStart : MonoBehaviour
         {
             refreshAppList();
         });
+        AppSelectionDropdownMouseOver = AppSelectionDropdown.GetComponent<DropdownMouseOver>();
         GameObject playerObject = GameObject.Find("Player Listener");
         playerListener = playerObject.GetComponent<SpatialPlayerListener>();
         
@@ -242,7 +232,7 @@ public class SpeakersStart : MonoBehaviour
         }
         foreach (var steamSourcePair in steamAudioSpeakers)
         {
-            steamSourcePair.Value.reflections = useSteamReverb;
+            steamSourcePair.Value.reflections = false;
             float rand = UnityEngine.Random.Range(0.85f, 1.15f);
             steamSourcePair.Value.dipolePower *= rand;
             rand = ((rand - 1.0f) * -1f) + 1.0f;
@@ -251,7 +241,7 @@ public class SpeakersStart : MonoBehaviour
         }
         foreach (AudioReverbFilter reverb in speakerReverbs.Values)
         {
-            reverb.enabled = !noReverb;
+            reverb.enabled = true;
         }
         bool defaultFound = false;
         bool VACFound = false;
@@ -277,6 +267,35 @@ public class SpeakersStart : MonoBehaviour
         {
             InputDropdownValueChanged(AudioInputDropdown);
         });
+        
+        foreach (AudioReverbPreset preset in (AudioReverbPreset[]) Enum.GetValues(typeof(AudioReverbPreset)))
+        {
+            if (preset != AudioReverbPreset.User)
+            {
+                ReverbPresetData = new Dropdown.OptionData();
+                ReverbPresetData.text = preset.ToString();
+                ReverbPresetMessages.Add(ReverbPresetData);
+                ReverbPresetDropdown.options.Add(ReverbPresetData);
+                SpawnRoomReverbPresetDropdown.options.Add(ReverbPresetData);
+                ReverbPresetIndex = ReverbPresetMessages.Count - 1;
+                if (preset == globalReverbPreset)
+                {
+                    ReverbPresetDropdown.value = ReverbPresetIndex;
+                }
+                if(preset == spawnRoomReverbPreset){
+                    SpawnRoomReverbPresetDropdown.value = ReverbPresetIndex;
+                }
+            }
+        }
+        ReverbPresetDropdown.onValueChanged.AddListener(delegate
+        {
+            ReverbPresetDropdownValueChanged(ReverbPresetDropdown);
+        });
+        SpawnRoomReverbPresetDropdown.onValueChanged.AddListener(delegate
+        {
+            SpawnRoomReverbPresetDropdownValueChanged(SpawnRoomReverbPresetDropdown);
+        });
+
         AppSelectionDropdown.onValueChanged.AddListener(delegate
         {
             AppSelectionDropdownValueChanged(AppSelectionDropdown);
@@ -296,13 +315,6 @@ public class SpeakersStart : MonoBehaviour
         sourceInit();
     }
 
-    // void ReloadSettings(){
-    //     inputName = PlayerPrefs.GetString("InputName", "Line 1 (Virtual Audio Cable)");
-    //     useSteamReverb = PlayerPrefs.GetInt("SteamReverb", 0) == 1;
-    //     noReverb = PlayerPrefs.GetInt("NoReverb", 0) == 1;
-    //     appExeName = PlayerPrefs.GetString("AppSourceName", "");
-    // }
-
     void GoalHornToggleValueChanged(Toggle change)
     {
         //isGoalHornEnabled = goalHornToggle.isOn;
@@ -312,8 +324,8 @@ public class SpeakersStart : MonoBehaviour
             isGoalHornEnabled = false;
             goalHornClip = null;
         }
-        // PlayerPrefs.SetInt("GoalHornEnabled", isGoalHornEnabled ? 1 : 0);
-        // PlayerPrefs.Save();
+        PlayerPrefs.SetInt("GoalHornEnabled", isGoalHornEnabled ? 1 : 0);
+        PlayerPrefs.Save();
     }
     IEnumerator TryLoadGoalHornWav(bool enableIfValid)
     {
@@ -383,6 +395,7 @@ public class SpeakersStart : MonoBehaviour
             AudioInputDropdown.enabled = false;
             AudioInputDropdown.interactable = false;
             GameObject.Find("AudioSourceDropdownLabel").GetComponent<Text>().enabled = false;
+            GameObject.Find("AudioSourceArrow").GetComponent<Image>().enabled = false;
             AudioInputDropdown.image.enabled = false;
         }
         else
@@ -390,6 +403,7 @@ public class SpeakersStart : MonoBehaviour
             AudioInputDropdown.enabled = true;
             AudioInputDropdown.interactable = true;
             GameObject.Find("AudioSourceDropdownLabel").GetComponent<Text>().enabled = true;
+            GameObject.Find("AudioSourceArrow").GetComponent<Image>().enabled = true;
             AudioInputDropdown.image.enabled = true;
         }
     }
@@ -563,10 +577,10 @@ public class SpeakersStart : MonoBehaviour
                                 // masterSpeaker.clip = goalHornClip;
                                 // masterSpeaker.loop = false;
                                 if(clipZeroed){
-                                    StartCoroutine(StartFade(0.25f, 1));
+                                    // StartCoroutine(StartFade(0.25f, 1));
                                     clipZeroed = false;
                                 }
-                                goalHornClipVolMult = averageMusicLoudness == 0.0f ? 0.3f : (averageMusicLoudness *1.1f / averageGoalHornLoudness);//+ 0.03225f;
+                                goalHornClipVolMult = averageMusicLoudness == 0.0f ? 0.3f : ((averageMusicLoudness *goalHornVolumeUserMult) / averageGoalHornLoudness);//+ 0.03225f;
                                 foreach (AudioSource aSource in speakers)
                                 {
                                     // speakerEchos[aSource.name].delay = 0f;
@@ -631,12 +645,12 @@ public class SpeakersStart : MonoBehaviour
                             float vol = Map(playerXAbs, 40.0001f, 90f, 0.01f, 0.79f);
                             AudioListener.volume = listenerVolume * (0.49f + (Mathf.Log10(vol) / -4.0f));//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
                             //UnityEngine.Debug.Log(listenerVolume);                                                          //Debug.Log(AudioListener.volume);
-                            if (useSteamReverb)
-                            {
-                                foreach (SteamAudioSource steamSource in steamAudioSpeakers.Values)
+                            if(!inSpawnRoom){
+                                foreach (AudioReverbFilter reverb in speakerReverbs.Values)
                                 {
-                                    steamSource.indirectMixLevel = playerListener.isReverbMixChangeOn ? AudioListener.volume * 1.0f : 1.0f;
+                                    reverb.reverbPreset = spawnRoomReverbPreset;
                                 }
+                                inSpawnRoom = true;
                             }
                             vol = Map(playerXAbs, 40.0001f, 76f, 0.0001f, 1.0f);
                             playerListernerLowPass.cutoffFrequency = 2000 + ((Mathf.Log10(vol) / -4.0f) * 16000f);
@@ -647,17 +661,14 @@ public class SpeakersStart : MonoBehaviour
                             //float vol2 = Map(40.001f, 40.0001f, 90f, 0.004f, 1.0f);
                             //AudioListener.volume = Mathf.Log10(vol) / -4.0f;//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
                             //Debug.Log(Mathf.Log10(vol2) / -4.0f);
-                            // if (AudioListener.volume != 1.0f)
-                            // {
-                            //     if (useSteamReverb)
-                            //     {
-                            //         foreach (SteamAudioSource steamSource in steamAudioSpeakers.Values)
-                            //         {
-                            //             steamSource.indirectMixLevel = 1.0f;
-                            //         }
-                            //     }
-                            // }
                             //UnityEngine.Debug.Log(listenerVolume);
+                            if(inSpawnRoom){
+                                foreach (AudioReverbFilter reverb in speakerReverbs.Values)
+                                {
+                                    reverb.reverbPreset = globalReverbPreset;
+                                }
+                                inSpawnRoom = false;
+                            }
                             AudioListener.volume = listenerVolume;
                             playerListernerLowPass.cutoffFrequency = 22000f;
                         }
@@ -690,6 +701,10 @@ public class SpeakersStart : MonoBehaviour
 
 
                     lastPos = pos;
+                }
+                if(AppSelectionDropdownMouseOver.isOver) {
+                    AppSelectionDropdownMouseOver.isOver = false;
+                    refreshAppList();
                 }
             }
 
@@ -747,6 +762,59 @@ public class SpeakersStart : MonoBehaviour
         }
     }
 
+    void ReverbPresetDropdownValueChanged(Dropdown change)
+    {
+        var newPreset = ReverbPresetDropdown.options[ReverbPresetDropdown.value].text;
+        AudioReverbPreset newPresetEnum;
+
+        if (Enum.TryParse<AudioReverbPreset>(newPreset, out newPresetEnum))
+        {
+            if(newPresetEnum != globalReverbPreset && isReady){
+                PlayerPrefs.SetInt("GlobalReverbPreset", (int)newPresetEnum);
+                PlayerPrefs.Save();
+                globalReverbPreset = newPresetEnum;
+                if(!inSpawnRoom && !goalHornPlaying){
+                    foreach (AudioReverbFilter reverb in speakerReverbs.Values)
+                    {
+                        reverb.reverbPreset = globalReverbPreset;
+                    }
+                }
+            }
+        }
+    }
+
+    void SpawnRoomReverbPresetDropdownValueChanged(Dropdown change)
+    {
+        var newPreset = SpawnRoomReverbPresetDropdown.options[SpawnRoomReverbPresetDropdown.value].text;
+        AudioReverbPreset newPresetEnum;
+
+        if (Enum.TryParse<AudioReverbPreset>(newPreset, out newPresetEnum))
+        {
+            if(newPresetEnum != spawnRoomReverbPreset && isReady){
+                PlayerPrefs.SetInt("SpawnRoomReverbPreset", (int)newPresetEnum);
+                PlayerPrefs.Save();
+                spawnRoomReverbPreset = newPresetEnum;
+                if(inSpawnRoom && !goalHornPlaying){
+                    foreach (AudioReverbFilter reverb in speakerReverbs.Values)
+                    {
+                        reverb.reverbPreset = spawnRoomReverbPreset;
+                    }
+                }
+            }
+        }
+    }
+
+    public void GoalHornVolMultChanged(float sliderValue) {
+         goalHornVolumeUserMult = (0.5f +(sliderValue * 0.05f));
+         PlayerPrefs.SetFloat("GoalHornVolumeUserMult", goalHornVolumeUserMult);
+         PlayerPrefs.Save();
+    }
+
+    public void GoalHornTimeChanged(float sliderValue) {
+        goalHornMaxDuration = sliderValue;
+        PlayerPrefs.SetFloat("GoalHornMaxDuration", goalHornMaxDuration);
+        PlayerPrefs.Save();
+    }
     void AppSelectionDropdownValueChanged(Dropdown change)
     {
         var newAppSource = AppSelectionDropdown.options[AppSelectionDropdown.value].text;
@@ -831,6 +899,7 @@ public class SpeakersStart : MonoBehaviour
         yield return new WaitForSeconds(2);
         masterSpeaker.clip = null;
         masterSpeaker.clip = masterClip;
+        if (!masterSpeaker.isPlaying) { masterSpeaker.Play(); }
         foreach (AudioSource aSource in speakers)
         {
             //speakerEchos[aSource.name].delay = 0f;
@@ -838,18 +907,12 @@ public class SpeakersStart : MonoBehaviour
             aSource.clip = masterClip;
             aSource.timeSamples = masterSpeaker.timeSamples;
             aSource.mute = false;
+            if (!aSource.isPlaying) { aSource.Play(); }
         }
         yield return null;
         foreach (AudioReverbFilter reverb in speakerReverbs.Values)
         {
-            if (!noReverb)
-            {
-                reverb.reverbPreset = AudioReverbPreset.Arena;
-            }
-            else
-            {
-                reverb.reverbPreset = AudioReverbPreset.Off;
-            }
+            reverb.reverbPreset = globalReverbPreset;
         }
         loops = 0;
         isReady = true;
@@ -861,7 +924,7 @@ public class SpeakersStart : MonoBehaviour
     private IEnumerator SyncSourcesAfterGoal()
     {
         //speakerEchos[masterSpeaker.name].delay = 0f;
-        float waitTime = 23;
+        float waitTime = goalHornMaxDuration;
         if (goalHornClip.length < waitTime)
         {
             waitTime = goalHornClip.length - 2.55f;
@@ -886,10 +949,13 @@ public class SpeakersStart : MonoBehaviour
         // masterSpeaker.timeSamples = lastPos;
         // masterSpeaker.clip = masterClip;
         // masterSpeaker.loop = true;
-        AudioReverbPreset preset = noReverb ? AudioReverbPreset.Off : AudioReverbPreset.Arena;
+        StartCoroutine(StartFade(0.15f, 0));
+
         foreach (AudioSource aSource in speakers)
         {
-            speakerReverbs[aSource.name].reverbPreset = preset;
+            if(!inSpawnRoom){
+                speakerReverbs[aSource.name].reverbPreset = globalReverbPreset;
+            }
             speakerEchos[aSource.name].delay = 0f;
             aSource.dopplerLevel = 0.0f;
             //aSource.clip = null;
@@ -898,29 +964,14 @@ public class SpeakersStart : MonoBehaviour
             aSource.timeSamples = masterSpeaker.timeSamples;
             aSource.volume *= 1f / goalHornClipVolMult;
         }
-        yield return null;
-        // foreach (AudioReverbFilter reverb in speakerReverbs.Values)
-        // {
-        //     if (!noReverb)
-        //     {
-        //         reverb.reverbPreset = AudioReverbPreset.Arena;
-        //     }
-        //     else
-        //     {
-        //         reverb.reverbPreset = AudioReverbPreset.Off;
-        //     }
-        // }
-        // foreach (AudioReverbFilter reverb in speakerReverbs.Values)
-        // {
-        //     if(!noReverb){
-        //         reverb.reverbPreset = AudioReverbPreset.Arena;
-        //     }
-        // }
         goalHornPlaying = false;
         loops = 0;
         isReady = true;
         goalHornToggle.enabled = true;
+        goalHornVolMultSlider.enabled = true;
+        goalHornTimeSlider.enabled = true;
         playerListener.speakersReady = true;
+        yield return null;
         // foreach (AudioSource aSource in speakers)
         // {
         //     // aSource.clip = masterClip;
@@ -953,6 +1004,7 @@ public class SpeakersStart : MonoBehaviour
     }
     private IEnumerator SyncSources()
     {
+        StartCoroutine(StartFade(0.15f, 0));
         //  while (true)
         //  {
         //previousTimeSamples = masterSpeaker.timeSamples;
@@ -968,6 +1020,7 @@ public class SpeakersStart : MonoBehaviour
             aSource.clip = masterClip;
             aSource.timeSamples = masterSpeaker.timeSamples;
         }
+        StartCoroutine(StartFade(0.15f, 1));
         loops = 0;
         isReady = true;
         playerListener.speakersReady = true;
@@ -978,6 +1031,9 @@ public class SpeakersStart : MonoBehaviour
     private IEnumerator SyncSourcesGoalHorn()
     {
         goalHornToggle.enabled = false;
+        goalHornVolMultSlider.enabled = false;
+        goalHornTimeSlider.enabled = false;
+        StartCoroutine(StartFade(0.15f, 0));
 
         //  while (true)
         //  {
@@ -997,8 +1053,8 @@ public class SpeakersStart : MonoBehaviour
             aSource.dopplerLevel = 0f;
             aSource.clip = goalHornClip;
             aSource.timeSamples = 13000;
-
         }
+        StartCoroutine(StartFade(0.15f, 1));
         // foreach (AudioSource aSource in speakers)
         // {
         //     aSource.Play();                        

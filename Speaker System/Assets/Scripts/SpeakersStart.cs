@@ -24,7 +24,7 @@ using System.ComponentModel;
 
 public class SpeakersStart : MonoBehaviour
 {
-    public string VERSION_TAGNAME = "v0.4.1";
+    public string VERSION_TAGNAME = "v0.4.2";
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern System.IntPtr GetActiveWindow();
@@ -899,7 +899,6 @@ public class SpeakersStart : MonoBehaviour
         yield return new WaitForSeconds(2);
         masterSpeaker.clip = null;
         masterSpeaker.clip = masterClip;
-        if (!masterSpeaker.isPlaying) { masterSpeaker.Play(); }
         foreach (AudioSource aSource in speakers)
         {
             //speakerEchos[aSource.name].delay = 0f;
@@ -907,7 +906,6 @@ public class SpeakersStart : MonoBehaviour
             aSource.clip = masterClip;
             aSource.timeSamples = masterSpeaker.timeSamples;
             aSource.mute = false;
-            if (!aSource.isPlaying) { aSource.Play(); }
         }
         yield return null;
         foreach (AudioReverbFilter reverb in speakerReverbs.Values)
@@ -1004,6 +1002,7 @@ public class SpeakersStart : MonoBehaviour
     }
     private IEnumerator SyncSources()
     {
+        bool shouldSetVol = listenerVolume != 0.0f;
         StartCoroutine(StartFade(0.15f, 0));
         //  while (true)
         //  {
@@ -1020,7 +1019,9 @@ public class SpeakersStart : MonoBehaviour
             aSource.clip = masterClip;
             aSource.timeSamples = masterSpeaker.timeSamples;
         }
-        StartCoroutine(StartFade(0.15f, 1));
+        if(shouldSetVol){
+            StartCoroutine(StartFade(0.15f, 1));
+        }
         loops = 0;
         isReady = true;
         playerListener.speakersReady = true;

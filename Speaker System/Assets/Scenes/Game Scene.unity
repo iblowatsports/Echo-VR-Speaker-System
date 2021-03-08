@@ -100,7 +100,7 @@ LightmapSettings:
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 112000000, guid: a530d7df96fd6064695938479becb73a,
     type: 2}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -18856,7 +18856,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 034fbd32a887ca647a425aac7b9a5e6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VERSION_TAGNAME: v0.4.1
+  VERSION_TAGNAME: v0.4.2
   Source1: {fileID: 0}
   hasCleanedUp: 0
   speedOfSoundMultiplier: 1.245

@@ -2,18 +2,24 @@
 
 This is a system to take any audio stream (usually music) and make it sound like it is being played from "speakers" in a stadium outside of the Arena when you are playing. This is positional audio that adds realistic echo/reverberations as well as taking into account the geometry of the Arena itself so that it feels as though you are hearing your music from a stadium surrounding you.
 
-![Speaker System App](https://github.com/iblowatsports/Echo-VR-Speaker-System/blob/main/EchoSpeakerSystem.png?raw=true)
+![Speaker System App](https://github.com/iblowatsports/Echo-VR-Speaker-System/blob/main/EchoSpeakerSystemV0_4_0.png?raw=true)
 
-
-## This project requires Virtual Audio Cable
-  * The Echo Speaker System installer will automatically download and open the installer of Virtual Audio Cable if you do not have it installed
-  * After installing VAC, make sure to restart your PC and to reset your default audio input and output devices in the Windows settings (Windows will automatically set Virtual Audio Cable as the default input and output device at install time, which you don't want)
   
  ## Setup
+ There are two methods to install and use Echo Speaker System: via Ignite Bot or as a standalone app. Using Echo Speaker System from Ignite Bot is **required for Quest users** and is also the only way to have custom goal horn support within Echo Speaker System.
  
- * Go to **[releases](https://github.com/iblowatsports/Echo-VR-Speaker-System/releases/latest)** and download the **InstallEchoSpeakerSystem.bat file. Run this file as administrator to install Echo Speaker System** and follow any UI prompts for Virtual Audio Cable installation if required (restart if needed as well)
+ ### Ignite Bot
+ * Go to https://ignitevr.gg/ignitebot download, and install the latest Ignite Bot
  * In the in-game settings for Echo VR, make sure that "Enable API Access" is set to "Enabled"
- * Run Echo Speaker System.exe from the folder you unzipped it to, when it launches: 
-   * Unless you have a specific use case, set/leave the Audio Input selection on "Line 1(Virtual Audio Cable). This is used as the audio input device for the speakers
-   * Select the application you would like played via the "speakers" (you may have to hit the refresh app list button if it does not show up). This will switch the selected app to be played via another input device. 
+ * Run Ignite Bot and click on the "Speaker System" tab. Click "Install Echo Speaker System" and follow the installation prompts
+ * To use Echo Speaker System, run Ignite Bot and click "Start Speaker System" from within the "Speaker System" tab
+ 
+ ### Standalone
+ * Go to **[releases](https://github.com/iblowatsports/Echo-VR-Speaker-System/releases/latest)** and download the **Installer exe. Run this as administrator to install Echo Speaker System**.
+ * In the in-game settings for Echo VR, make sure that "Enable API Access" is set to "Enabled"
+ * Run Echo Speaker System
+   * Select the application you would like played via the "speakers" (you may have to hit the refresh app list button if it does not show up). This will switch the selected app to be played via Echo Speaker System. 
 * Any sound played from the selected application will now go through the virtual speakers surrounding the arena. Once you close the Echo Speaker System exe, the application you had selected will be switched back to the audio device it originally was using. Any time the Echo Speaker System exe is run in the future, it will attempt to automatically find and use the Application you had previously used with the Speaker System
+
+## Note for Quest Users
+In order to use this on Quest, you **must** install Ignite Bot and use Echo Speaker System from within Ignite Bot, as Ignite Bot handles finding and getting the API data from the Quest over the network. Also, in order to use this on Quest, you must have some way to get the audio from your PC to your Quest (ex: using a headset that supports wireless audio from your PC and wired audio from your Quest at the same time). **This app will not work if you do not have a way to listen to audio from your PC while playing on your Quest**

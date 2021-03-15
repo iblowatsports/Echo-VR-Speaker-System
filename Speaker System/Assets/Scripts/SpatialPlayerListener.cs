@@ -9,7 +9,7 @@ using System.Threading;
 
 public class SpatialPlayerListener : MonoBehaviour
 {
-    static string defaultPos = "{\"position\":[ 0,0,-23], \"forward\":[0.0,0.0,1.0], \"left\":[0.0,0.0,0.0], \"up\":[0.9,0.0,0.0]}";
+    static string defaultPos = "{\"position\":[ 0,0,-23], \"forward\":[0.0,0.0,1.0], \"left\":[0.0,0.0,0.0], \"up\":[0.0,0.0,0.0]}";
     GameObject playerObject;
     static string echoVRIP = "127.0.0.1";
     static string echoVRPort = "6721";

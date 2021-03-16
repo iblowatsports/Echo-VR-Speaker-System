@@ -95,7 +95,7 @@ public class SpeakersStart : MonoBehaviour
     float listenerVolume, goalHornClipVolMult = 0.0f;
     float goalHornVolumeUserMult = 1.1f;
     Slider goalHornVolMultSlider, goalHornTimeSlider;
-    SpatialPlayerListener playerListener;
+    PlayerListener playerListener;
     SteamAudioListener steamAudioListener;
     AudioListener playerAudioListener;
     AudioLowPassFilter playerListernerLowPass;
@@ -195,9 +195,10 @@ public class SpeakersStart : MonoBehaviour
         });
         AppSelectionDropdownMouseOver = AppSelectionDropdown.GetComponent<DropdownMouseOver>();
         GameObject playerObject = GameObject.Find("Player Listener");
-        playerListener = playerObject.GetComponent<SpatialPlayerListener>();
+        playerListener = playerObject.GetComponent<PlayerListener>();
         
-        if (!playerListener.isIgniteBotEmbedded)
+        //TODO: replace
+        if (1 == 1)
         {
             StartCoroutine(GetLatestVer());
             isGoalHornEnabled = false;
@@ -411,7 +412,6 @@ public class SpeakersStart : MonoBehaviour
     void sourceInit()
     {
         isReady = false;
-        playerListener.speakersReady = false;
         masterSpeaker.clip = null;
         if (masterSpeaker.isPlaying)
         {
@@ -487,7 +487,8 @@ public class SpeakersStart : MonoBehaviour
     void FixedUpdate()
     {
         //m_MyAudioSource = GetComponent<AudioSource>();
-        if (playerListener.quitCalled)
+        //TODO: replace
+        if (1 == 0)
         {
             Cleanup();
         }
@@ -565,10 +566,10 @@ public class SpeakersStart : MonoBehaviour
                     }
                     if (isReady)
                     {
-                        if (playerListener.goalScored)
+                        if (playerListener.GoalDetected)
                         {
                             if(goalHornPlaying || !isGoalHornEnabled){
-                                playerListener.goalScored = false;
+                                playerListener.GoalDetected = false;
                             }else{
                                 // previousTimeSamples = masterSpeaker.timeSamples;
                                 // speakerEchos[masterSpeaker.name].delay = 0f;
@@ -592,7 +593,7 @@ public class SpeakersStart : MonoBehaviour
                                 }
                                 StartCoroutine(SyncSourcesGoalHorn());
                                 goalHornPlaying = true;
-                                playerListener.goalScored = false;
+                                playerListener.GoalDetected = false;
                                 StartCoroutine(SyncSourcesAfterGoal());
                             }
                         }
@@ -639,7 +640,7 @@ public class SpeakersStart : MonoBehaviour
                             if (!masterSpeaker.isPlaying) { masterSpeaker.Play(); }
                         }
 
-                        float playerXAbs = Math.Abs(playerListener.head.position.x);
+                        float playerXAbs = Math.Abs(playerListener.HeadPos.x);
                         if (playerXAbs > 40f)
                         {
                             float vol = Map(playerXAbs, 40.0001f, 90f, 0.01f, 0.79f);
@@ -672,7 +673,7 @@ public class SpeakersStart : MonoBehaviour
                             AudioListener.volume = listenerVolume;
                             playerListernerLowPass.cutoffFrequency = 22000f;
                         }
-                        if (playerListener.head.position.x != -105.5 && (playerXAbs > 72))
+                        if (playerListener.HeadPos.x != -105.5 && (playerXAbs > 72))
                         {
                             if (!respawnResetDone)
                             {
@@ -914,7 +915,6 @@ public class SpeakersStart : MonoBehaviour
         }
         loops = 0;
         isReady = true;
-        playerListener.speakersReady = true;
         yield return new WaitForSeconds(0.5f);
         StartCoroutine(StartFade(3, 1));
     }
@@ -968,7 +968,6 @@ public class SpeakersStart : MonoBehaviour
         goalHornToggle.enabled = true;
         goalHornVolMultSlider.enabled = true;
         goalHornTimeSlider.enabled = true;
-        playerListener.speakersReady = true;
         yield return null;
         // foreach (AudioSource aSource in speakers)
         // {
@@ -984,7 +983,6 @@ public class SpeakersStart : MonoBehaviour
     {
         //  while (true)
         isReady = false;
-        playerListener.speakersReady = false;
         Microphone.End(inputName);
         //PlayerPrefs.SetString("InputName", newInput);
         //PlayerPrefs.Save();
@@ -1024,7 +1022,6 @@ public class SpeakersStart : MonoBehaviour
         }
         loops = 0;
         isReady = true;
-        playerListener.speakersReady = true;
         yield return null;
         //  }
     }
@@ -1063,7 +1060,6 @@ public class SpeakersStart : MonoBehaviour
 
         loops = 0;
         isReady = true;
-        playerListener.speakersReady = true;
         yield return null;
         //  }
     }
@@ -1173,7 +1169,6 @@ public class SpeakersStart : MonoBehaviour
         {
             if (!hasCleanedUp)
             {
-                playerListener.Cleanup();
                 Microphone.End(inputName);
                 if (wasAppEndpointChanged)
                 {

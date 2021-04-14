@@ -6,13 +6,13 @@ This is a system to take any audio stream (usually music) and make it sound like
 
   
  ## Setup
- There are two methods to install and use Echo Speaker System: via Ignite Bot or as a standalone app. Using Echo Speaker System from Ignite Bot is **required for Quest users** and is also the only way to have custom goal horn support within Echo Speaker System.
+ There are two methods to install and use Echo Speaker System: via Spark (Formerly Ignite Bot) or as a standalone app. Using Echo Speaker System from within Spark is **required for Quest users** and is also the only way to have custom goal horn support within Echo Speaker System.
  
- ### Ignite Bot
- * Go to https://ignitevr.gg/ignitebot download, and install the latest Ignite Bot
+ ### Spark
+ * Go to https://ignitevr.gg/spark download, and install the latest install of Spark
  * In the in-game settings for Echo VR, make sure that "Enable API Access" is set to "Enabled"
- * Run Ignite Bot and click on the "Speaker System" tab. Click "Install Echo Speaker System" and follow the installation prompts
- * To use Echo Speaker System, run Ignite Bot and click "Start Speaker System" from within the "Speaker System" tab
+ * Run Spark and click on the "Speaker System" tab. Click "Install Echo Speaker System" and follow the installation prompts
+ * To use Echo Speaker System, run Spark and click "Start Speaker System" from within the "Speaker System" tab
  
  ### Standalone
  * Go to **[releases](https://github.com/iblowatsports/Echo-VR-Speaker-System/releases/latest)** and download the **Installer exe. Run this as administrator to install Echo Speaker System**.
@@ -22,4 +22,4 @@ This is a system to take any audio stream (usually music) and make it sound like
 * Any sound played from the selected application will now go through the virtual speakers surrounding the arena. Once you close the Echo Speaker System exe, the application you had selected will be switched back to the audio device it originally was using. Any time the Echo Speaker System exe is run in the future, it will attempt to automatically find and use the Application you had previously used with the Speaker System
 
 ## Note for Quest Users
-In order to use this on Quest, you **must** install Ignite Bot and use Echo Speaker System from within Ignite Bot, as Ignite Bot handles finding and getting the API data from the Quest over the network. Also, in order to use this on Quest, you must have some way to get the audio from your PC to your Quest (ex: using a headset that supports wireless audio from your PC and wired audio from your Quest at the same time). **This app will not work if you do not have a way to listen to audio from your PC while playing on your Quest**
+In order to use this on Quest, you **must** install Spark and use Echo Speaker System from within Spark, as Spark handles finding and getting the API data from the Quest over the network. Also, in order to use this on Quest, you must have some way to get the audio from your PC to your Quest (ex: using a headset that supports wireless audio from your PC and wired audio from your Quest at the same time). **This app will not work if you do not have a way to listen to audio from your PC while playing on your Quest**

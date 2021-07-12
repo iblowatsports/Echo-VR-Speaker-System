@@ -9,7 +9,7 @@ using UnityEngine;
  
      void Start() {
          textComponent = GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "GoalHornTimeTextVal").GetComponent<Text>();
-         textComponent.text = textValue;
+         SetSliderValue(PlayerPrefs.GetFloat("GoalHornMaxDuration", 23f));
      }
     
  

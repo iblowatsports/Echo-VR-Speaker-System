@@ -131,7 +131,7 @@ public class SpatialPlayerListener : MonoBehaviour
             else if(str == "RawFrame")
             {
                 string messageReceived = e.Socket.ReceiveFrameString();
-                Console.WriteLine(messageReceived + "\n");
+                // Console.WriteLine(messageReceived + "\n");
                 Thread.Sleep(2);
                 bool found = false;
                 try

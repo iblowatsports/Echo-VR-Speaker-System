@@ -9,7 +9,7 @@ using UnityEngine;
  
      void Start() {
          textComponent = GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "GoalHornVolTextVal").GetComponent<Text>();
-         textComponent.text = textValue;
+         SetSliderValue((PlayerPrefs.GetFloat("GoalHornVolumeUserMult", 1.1f)- 0.5f)/0.05f);
      }
     
  

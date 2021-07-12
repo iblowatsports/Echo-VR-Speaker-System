@@ -24,7 +24,14 @@ using System.ComponentModel;
 
 public class SpeakersStart : MonoBehaviour
 {
-    public string VERSION_TAGNAME = "v0.4.3";
+    public string VERSION_TAGNAME = "v0.4.4";
+    public float playerXAbsMult = 1.0f;
+    public float tunnelEndMapDist = 40.0001f;
+    public float maxTunnelMapDist = 90f;
+    public float minVolumeMap = 0.01f;
+    public float maxVolumeMap = 0.79f;
+    public float spawnRoomVolumeFloor = 0.49f;
+    public float spawnRoomLowPassFloor = 2000f;
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern System.IntPtr GetActiveWindow();
@@ -94,7 +101,7 @@ public class SpeakersStart : MonoBehaviour
     bool reverseLoopOrder;
     float listenerVolume, goalHornClipVolMult = 0.0f;
     float goalHornVolumeUserMult = 1.1f;
-    Slider goalHornVolMultSlider, goalHornTimeSlider;
+    Slider goalHornVolMultSlider, goalHornTimeSlider, spawnRoomVolFloorSlider, spawnRoomLowPassFloorSlider;
     SpatialPlayerListener playerListener;
     SteamAudioListener steamAudioListener;
     AudioListener playerAudioListener;
@@ -131,14 +138,19 @@ public class SpeakersStart : MonoBehaviour
         AudioSettings.Reset(config);
         MSSettingsBtn = GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "OpenMSAppAudioSettingsBtn").GetComponent<Button>();
         goalHornVolMultSlider = GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "GoalHornVolMultSlider").GetComponent<Slider>();
+        spawnRoomVolFloorSlider = GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "SpawnRoomVolumeFloorSlider").GetComponent<Slider>();
         goalHornTimeSlider = GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "GoalHornTimeSlider").GetComponent<Slider>();
         isNewUpdate = PlayerPrefs.GetString("RunningVersion", "") != VERSION_TAGNAME;
         globalReverbPreset = (AudioReverbPreset)PlayerPrefs.GetInt("GlobalReverbPreset", (int)AudioReverbPreset.Arena);
         spawnRoomReverbPreset = (AudioReverbPreset)PlayerPrefs.GetInt("SpawnRoomReverbPreset", (int)AudioReverbPreset.Arena);
         goalHornVolumeUserMult = PlayerPrefs.GetFloat("GoalHornVolumeUserMult", 1.1f);
         goalHornMaxDuration = PlayerPrefs.GetFloat("GoalHornMaxDuration", 23f);
+        //PlayerPrefs.DeleteKey("SpawnRoomVolumeFloor");
+        spawnRoomVolumeFloor = PlayerPrefs.GetFloat("SpawnRoomVolumeFloor", 0.5f);
+        spawnRoomLowPassFloor = PlayerPrefs.GetFloat("spawnRoomLowPassFloor", 2000f);
         goalHornTimeSlider.value = goalHornMaxDuration;
         goalHornVolMultSlider.value = (goalHornVolumeUserMult - 0.5f)/0.05f;
+        spawnRoomVolFloorSlider.value = (spawnRoomVolumeFloor)/0.05f;
         StartCoroutine(GetWhatsNew());
         string[] args = System.Environment.GetCommandLineArgs();
         for (int i = 0; i < args.Length; i++)
@@ -165,6 +177,16 @@ public class SpeakersStart : MonoBehaviour
         
         inputName = PlayerPrefs.GetString("InputName", "Line 1 (Virtual Audio Cable)");
         appExeName = PlayerPrefs.GetString("AppSourceName", "");
+        audioEndpointsJson = GetAudioInfo();
+        string endpointsJSON = PlayerPrefs.GetString("AppSourceOriginalEndpoints", "");
+        if(endpointsJSON.Length > 0){
+            AppAudioEndpoints AppEndPoints = JsonUtility.FromJson<AppAudioEndpoints>(endpointsJSON);
+            foreach(AppEndpoint end in AppEndPoints.endpoints){
+                ResetAppEndpoint(end.appName, end.originalEndpointID);
+            }
+            originalAppEndpoint = "";
+            PlayerPrefs.DeleteKey("AppSourceOriginalEndpoints");
+        }
         AudioInputDropdown = GameObject.Find("AudioSourceDropdown").GetComponent<Dropdown>();
         if(inputName != "Line 1 (Virtual Audio Cable)"){
             ShowHideInputDropdown(true);
@@ -210,6 +232,13 @@ public class SpeakersStart : MonoBehaviour
         playerAudioListener = playerObject.GetComponent<AudioListener>();
         steamAudioListener = playerAudioListener.GetComponent<SteamAudioListener>();
         playerListernerLowPass = playerAudioListener.GetComponent<AudioLowPassFilter>();
+        spawnRoomLowPassFloorSlider = GameObject.Find("UICanvas").transform.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "SpawnRoomLowPassFilterSlider").GetComponent<Slider>();
+        spawnRoomLowPassFloorSlider.value = (spawnRoomLowPassFloor)/200f;
+        if(spawnRoomLowPassFloor > 0f){
+            playerListernerLowPass.enabled = true;
+        }else{
+            playerListernerLowPass.enabled = false;
+        }
         masterSpeaker = GameObject.Find("MasterSpeaker").GetComponent<AudioSource>();
         // float mRandom = UnityEngine.Random.Range(0.92f,1.08f);
         // masterSpeaker.volume *= mRandom;
@@ -642,9 +671,9 @@ public class SpeakersStart : MonoBehaviour
                         float playerXAbs = Math.Abs(playerListener.head.position.x);
                         if (playerXAbs > 40f)
                         {
-                            float vol = Map(playerXAbs, 40.0001f, 90f, 0.01f, 0.79f);
-                            AudioListener.volume = listenerVolume * (0.49f + (Mathf.Log10(vol) / -4.0f));//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
-                            //UnityEngine.Debug.Log(listenerVolume);                                                          //Debug.Log(AudioListener.volume);
+                            float vol = Map((playerXAbs*playerXAbsMult), tunnelEndMapDist, maxTunnelMapDist, minVolumeMap, maxVolumeMap);
+                            AudioListener.volume = listenerVolume * (spawnRoomVolumeFloor + (Mathf.Log10(vol) / -4.0f));//41/(playerXAbs);// Mathf.Log10((41/(Math.Abs(playerListener.head.position.x)))*(41/(Math.Abs(playerListener.head.position.x))) * 20) - 0.29f; //
+                            UnityEngine.Debug.Log(AudioListener.volume);                                                          //Debug.Log(AudioListener.volume);
                             if(!inSpawnRoom){
                                 foreach (AudioReverbFilter reverb in speakerReverbs.Values)
                                 {
@@ -653,7 +682,7 @@ public class SpeakersStart : MonoBehaviour
                                 inSpawnRoom = true;
                             }
                             vol = Map(playerXAbs, 40.0001f, 76f, 0.0001f, 1.0f);
-                            playerListernerLowPass.cutoffFrequency = 2000 + ((Mathf.Log10(vol) / -4.0f) * 16000f);
+                            playerListernerLowPass.cutoffFrequency = spawnRoomLowPassFloor + ((Mathf.Log10(vol) / -4.0f) * 16000f);
 
                         }
                         else
@@ -815,6 +844,22 @@ public class SpeakersStart : MonoBehaviour
         PlayerPrefs.SetFloat("GoalHornMaxDuration", goalHornMaxDuration);
         PlayerPrefs.Save();
     }
+
+    public void SpawnRoomVolumeFloorChanged(float sliderValue) {
+        spawnRoomVolumeFloor = ((sliderValue * 0.05f));
+        PlayerPrefs.SetFloat("SpawnRoomVolumeFloor", spawnRoomVolumeFloor);
+        PlayerPrefs.Save();
+    }
+    public void SpawnRoomLowPassFloorChanged(float sliderValue) {
+        spawnRoomLowPassFloor = ((sliderValue * 200f));
+        if(spawnRoomLowPassFloor > 0f){
+            playerListernerLowPass.enabled = true;
+        }else{
+            playerListernerLowPass.enabled = false;
+        }
+        PlayerPrefs.SetFloat("spawnRoomLowPassFloor", spawnRoomLowPassFloor);
+        PlayerPrefs.Save();
+    }
     void AppSelectionDropdownValueChanged(Dropdown change)
     {
         var newAppSource = AppSelectionDropdown.options[AppSelectionDropdown.value].text;
@@ -916,7 +961,7 @@ public class SpeakersStart : MonoBehaviour
         isReady = true;
         playerListener.speakersReady = true;
         yield return new WaitForSeconds(0.5f);
-        StartCoroutine(StartFade(3, 1));
+        StartCoroutine(StartFade(4, 1));
     }
 
     private IEnumerator SyncSourcesAfterGoal()
@@ -967,6 +1012,7 @@ public class SpeakersStart : MonoBehaviour
         isReady = true;
         goalHornToggle.enabled = true;
         goalHornVolMultSlider.enabled = true;
+        spawnRoomVolFloorSlider.enabled = true;
         goalHornTimeSlider.enabled = true;
         playerListener.speakersReady = true;
         yield return null;
@@ -1020,6 +1066,7 @@ public class SpeakersStart : MonoBehaviour
             aSource.timeSamples = masterSpeaker.timeSamples;
         }
         if(shouldSetVol){
+            // yield return new WaitForSeconds(0.16f);
             StartCoroutine(StartFade(0.15f, 1));
         }
         loops = 0;
@@ -1114,12 +1161,17 @@ public class SpeakersStart : MonoBehaviour
                 {
                     if (string.IsNullOrWhiteSpace(line))
                     {
-                        originalAppEndpoints.Add(new AppEndpoint { processId = procID, originalEndpointID = "" });
+                        originalAppEndpoints.Add(new AppEndpoint {appName = appExeName, processId = procID, originalEndpointID = "" });
                     }
                     else
                     {
-                        originalAppEndpoints.Add(new AppEndpoint { processId = procID, originalEndpointID = line });
+                        originalAppEndpoints.Add(new AppEndpoint {appName = appExeName, processId = procID, originalEndpointID = line });
                     }
+                    AppAudioEndpoints ae = new AppAudioEndpoints{endpoints = originalAppEndpoints};
+                    // ae.endpoints = originalAppEndpoints;
+                    string endpointJSON = JsonUtility.ToJson(ae);
+                    PlayerPrefs.SetString("AppSourceOriginalEndpoints", endpointJSON);
+                    PlayerPrefs.Save();
                 }
             }
         }
@@ -1150,6 +1202,9 @@ public class SpeakersStart : MonoBehaviour
             wasAppEndpointChanged = false;
             originalAppEndpoint = "";
             originalAppEndpoints.Remove(originalEndpoint);
+            string endpointJSON = JsonUtility.ToJson(originalAppEndpoints);
+            PlayerPrefs.SetString("AppSourceOriginalEndpoints", endpointJSON);
+            PlayerPrefs.Save();
         }
         yield return null;
     }
@@ -1201,12 +1256,43 @@ public class SpeakersStart : MonoBehaviour
                         AudioSwitch.WaitForExit(900);
                         wasAppEndpointChanged = false;
                         originalAppEndpoint = "";
+                        PlayerPrefs.DeleteKey("AppSourceOriginalEndpoints");
+
                         hasCleanedUp = true;
                     }
                 }
             }
         }
         catch (Exception ex) { }
+    }
+
+    void ResetAppEndpointFromPreviousSession(string appName, string endpoint){
+        ResetAppEndpoint(appName, endpoint);
+    }
+    void ResetAppEndpoint(string appName, string endpoint){
+         var Originalsession = audioEndpointsJson.endpoints
+                .SelectMany(e => e.sessions)
+                .Where(s => s.exeName == appName)
+                .FirstOrDefault();
+                    if (Originalsession != null)
+                    {
+                        Process AudioSwitch = new Process
+                        {
+                            StartInfo = new ProcessStartInfo
+                            {
+                                FileName = (Application.streamingAssetsPath + "\\AudioSwitch.exe"),
+                                Arguments = Originalsession.processId + " \"" + endpoint + "\"",
+                                UseShellExecute = false,
+                                RedirectStandardOutput = true,
+                                RedirectStandardInput = true,
+                                RedirectStandardError = true,
+                                CreateNoWindow = true
+                            }
+
+                        };
+                        AudioSwitch.Start();
+                        AudioSwitch.WaitForExit(900);
+                    }
     }
     IEnumerator GetLatestVer()
     {
@@ -1524,8 +1610,15 @@ public class Session
     public int processId;
 }
 
+[System.Serializable]
+public class AppAudioEndpoints
+{
+    public List<AppEndpoint> endpoints;
+}
+[System.Serializable]
 public class AppEndpoint
 {
+    public string appName;
     public string originalEndpointID;
     public int processId;
 }
